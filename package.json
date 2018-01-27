@@ -27,6 +27,6 @@
   },
   "homepage": "https://github.com/ecomclub/ecomplus-store-render#readme",
   "standard": {
-    "globals": [ "Vue", "axions", "EcomIo" ]
+    "globals": [ "Vue", "axios", "EcomIo" ]
   }
 }
