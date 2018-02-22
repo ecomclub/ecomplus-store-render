@@ -4,8 +4,43 @@
 window.Ecom = (function () {
   var stores = []
 
+  var findChildsByClass = function (doc, className) {
+    // returns array of DOM elements
+    var els = []
+    for (var i = 0; i < doc.childNodes.length; i++) {
+      var classes = doc.childNodes[i].classList
+      if (Array.isArray(classes)) {
+        for (var ii = 0; ii < classes.length; ii++) {
+          if (classes[ii] === className) {
+            // match
+            els.push(classes[ii])
+          }
+        }
+      }
+    }
+    return els
+  }
+
   var render = function (store) {
     // render store in the HTML DOM
+    var doc
+    if (store.hasOwnProperty('el')) {
+      doc = store.el
+    } else {
+      // <body>
+      doc = document.getElementsByTagName('BODY')[0]
+    }
+
+    // render elements
+    // https://developers.e-com.plus/ecomplus-store-template/#vue-instances
+    var els = findChildsByClass(doc, '_ecom-el')
+    for (var i = 0; i < els.length; i++) {
+      var vm = new Vue({
+        // options
+      })
+      // destroy Vue instace after element rendering
+      vm.$destroy()
+    }
   }
 
   return {
