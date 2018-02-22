@@ -15,5 +15,5 @@ Or install [npm package](https://www.npmjs.com/package/ecomplus-render):
 
 `npm install --save ecomplus-render`
 
-It requires `EcomIo` object from
+It requires global `EcomIo` object from
 [storefront JS SDK](https://github.com/ecomclub/ecomplus-sdk-js).
