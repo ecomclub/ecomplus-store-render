@@ -44,14 +44,39 @@ window.Ecom = (function () {
         // https://developers.e-com.plus/ecomplus-store-template/#vue-instances
         var els = findChildsByClass(doc, '_ecom-el')
         for (var i = 0; i < els.length; i++) {
-          // var body
-          var vm = new Vue({
-            'el': els[i],
-            'data': body
-          })
+          var el = els[i]
+          var storeApiEndpoint
+          var callback
+          switch (el.dataset.type) {
+            case 'product':
+            case 'brand':
+            case 'collection':
+            case 'customer':
+            case 'cart':
+            case 'order':
+            case 'application':
+            case 'store':
+              // eg.: products
+              storeApiEndpoint = el.dataset.type + 's'
+              break
+            case 'category':
+              storeApiEndpoint = el.dataset.type.slice(0, -1) + 'ies'
+              break
+          }
 
-          // destroy Vue instace after element rendering
-          vm.$destroy()
+          if (storeApiEndpoint !== undefined) {
+            callback = function (err, body) {
+              if (!err) {
+                var vm = new Vue({
+                  'el': els[i],
+                  'data': body
+                })
+                // destroy Vue instace after element rendering
+                vm.$destroy()
+              }
+            }
+            EcomIo.getById(callback, storeApiEndpoint, '123a5432109876543210cdef')
+          }
         }
       } else {
       }
