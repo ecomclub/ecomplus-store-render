@@ -33,16 +33,23 @@ window.Ecom = (function () {
 
     var callback = function (err, body) {
       if (!err) {
+        if (typeof body === 'object' && body !== null) {
+          // returned body from domains resource of Main API
+          // http://ecomplus.docs.apiary.io/
+          store.store_id = body.store_id
+          store.store_object_id = body.store_object_id
+        }
+
         // render elements
         // https://developers.e-com.plus/ecomplus-store-template/#vue-instances
         var els = findChildsByClass(doc, '_ecom-el')
         for (var i = 0; i < els.length; i++) {
+          // var body
           var vm = new Vue({
-            el: els[i],
-            data: {
-              'message': 'Hello'
-            }
+            'el': els[i],
+            'data': body
           })
+
           // destroy Vue instace after element rendering
           vm.$destroy()
         }
