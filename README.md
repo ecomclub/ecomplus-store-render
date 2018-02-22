@@ -17,3 +17,5 @@ Or install [npm package](https://www.npmjs.com/package/ecomplus-render):
 
 It requires global `EcomIo` object from
 [storefront JS SDK](https://github.com/ecomclub/ecomplus-sdk-js).
+
+[Storefront theme documentation](https://ecomclub.github.io/ecomplus-store-template/).
