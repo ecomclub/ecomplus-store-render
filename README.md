@@ -5,6 +5,9 @@
 
 Vue.js app (frontend) to render E-Com Plus store template.
 
+It **requires** global `EcomIo` object from
+[storefront JS SDK](https://github.com/ecomclub/ecomplus-sdk-js).
+
 Include minified script via CDN:
 
 ```html
@@ -14,8 +17,5 @@ Include minified script via CDN:
 Or install [npm package](https://www.npmjs.com/package/ecomplus-render):
 
 `npm install --save ecomplus-render`
-
-It requires global `EcomIo` object from
-[storefront JS SDK](https://github.com/ecomclub/ecomplus-sdk-js).
 
 [Storefront theme documentation](https://ecomclub.github.io/ecomplus-store-template/).
