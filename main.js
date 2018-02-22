@@ -1,7 +1,6 @@
-'use strict'
-
-// global Ecom
 window.Ecom = (function () {
+  'use strict'
+
   var stores = []
 
   var findChildsByClass = function (doc, className) {
@@ -13,7 +12,8 @@ window.Ecom = (function () {
         for (var ii = 0; ii < classes.length; ii++) {
           if (classes[ii] === className) {
             // match
-            els.push(classes[ii])
+            els.push(doc.childNodes[i])
+            break
           }
         }
       }
@@ -31,15 +31,31 @@ window.Ecom = (function () {
       doc = document.getElementsByTagName('BODY')[0]
     }
 
-    // render elements
-    // https://developers.e-com.plus/ecomplus-store-template/#vue-instances
-    var els = findChildsByClass(doc, '_ecom-el')
-    for (var i = 0; i < els.length; i++) {
-      var vm = new Vue({
-        // options
-      })
-      // destroy Vue instace after element rendering
-      vm.$destroy()
+    var callback = function (err, body) {
+      if (!err) {
+        // render elements
+        // https://developers.e-com.plus/ecomplus-store-template/#vue-instances
+        var els = findChildsByClass(doc, '_ecom-el')
+        for (var i = 0; i < els.length; i++) {
+          var vm = new Vue({
+            el: els[i],
+            data: {
+              'message': 'Hello'
+            }
+          })
+          // destroy Vue instace after element rendering
+          vm.$destroy()
+        }
+      } else {
+      }
+    }
+
+    // initialize storefront SDK
+    if (store.hasOwnProperty('store_id') && store.hasOwnProperty('store_object_id')) {
+      EcomIo.init(callback, store.store_id, store.store_object_id)
+    } else {
+      // set store in function of site domain name
+      EcomIo.init(callback)
     }
   }
 
