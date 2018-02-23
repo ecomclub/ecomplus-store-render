@@ -22,6 +22,9 @@ window.Ecom = (function () {
   for (var method in methods) {
     if (methods.hasOwnProperty(method)) {
       vueEcom.methods['ecom_' + method] = function (body) {
+        if (body === undefined) {
+          body = this
+        }
         // call global method
         return methods[method](this.Store, body)
       }
