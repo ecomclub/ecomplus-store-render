@@ -21,7 +21,7 @@ window.Ecom = (function () {
   }
   for (var method in methods) {
     if (methods.hasOwnProperty(method)) {
-      vueEcom.methods['ecom_' + method] = function (body) {
+      vueEcom.methods[method] = function (body) {
         if (body === undefined) {
           // send instance data
           body = this.$data
