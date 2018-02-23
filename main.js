@@ -78,6 +78,8 @@ window.Ecom = (function () {
                   'data': body,
                   'methods': vueMethods
                 })
+                // pass store properties to instance data
+                vm.Store = store
                 // destroy Vue instace after element rendering
                 vm.$destroy()
               }
