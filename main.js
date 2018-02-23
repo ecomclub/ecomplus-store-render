@@ -2,6 +2,11 @@ window.Ecom = (function () {
   'use strict'
 
   var stores = []
+  // methods for Vue instances
+  var vueMethods = {
+    'Ecom': {
+    }
+  }
 
   var findChildsByClass = function (doc, className) {
     // returns array of DOM elements
@@ -70,7 +75,8 @@ window.Ecom = (function () {
               if (!err) {
                 var vm = new Vue({
                   'el': els[i],
-                  'data': body
+                  'data': body,
+                  'methods': vueMethods
                 })
                 // destroy Vue instace after element rendering
                 vm.$destroy()
@@ -93,17 +99,17 @@ window.Ecom = (function () {
   }
 
   return {
-    'init': function (storeId, storeObjectId, lang) {
+    'init': function (VueMethods, StoreId, StoreObjectId, Lang) {
       var i, store
 
-      if (storeId && storeObjectId) {
+      if (StoreId && StoreObjectId) {
         // set store from function arguments
         store = {
-          'store_id': parseInt(storeId, 10),
-          'store_object_id': storeObjectId
+          'store_id': parseInt(StoreId, 10),
+          'store_object_id': StoreObjectId
         }
-        if (lang) {
-          store.lang = lang
+        if (Lang) {
+          store.lang = Lang
         }
         stores.push(store)
       } else {
@@ -128,6 +134,11 @@ window.Ecom = (function () {
         }
       }
 
+      if (typeof VueMethods === 'object' && VueMethods !== null) {
+        // set on higher scope
+        // merge with predefined methods
+        vueMethods = Object.assign(vueMethods, VueMethods)
+      }
       // start rendering
       for (i = 0; i < stores.length; i++) {
         render(stores[i])
