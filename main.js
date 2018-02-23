@@ -2,26 +2,33 @@ window.Ecom = (function () {
   'use strict'
 
   var stores = []
-  var defaultLang = null
 
-  // predefined Vue instances ontions
-  var vueOptions = {}
-  // create Vue plugin with global methods
-  var EcomVue = {
-    'install': function (Vue) {
-      Vue.prototype.$ecom = {
-        'name': function (item) {
-          // prefer translated item name
-          if (item.hasOwnProperty('i18n') && item.i18n.hasOwnProperty(defaultLang)) {
-            return item.i18n[defaultLang]
-          } else {
-            return item.name
-          }
-        }
+  // global Ecom utility methods
+  var methods = {
+    'name': function (store, body) {
+      // prefer translated item name
+      if (body.hasOwnProperty('i18n') && body.i18n.hasOwnProperty(store.lang)) {
+        return body.i18n[store.lang]
+      } else {
+        return body.name
       }
     }
   }
-  Vue.use(EcomVue)
+
+  // Ecom methods for Vue instance
+  var vueEcom = {
+    'methods': {}
+  }
+  for (var method in methods) {
+    if (methods.hasOwnProperty(method)) {
+      vueEcom.methods['ecom_' + method] = function (body) {
+        // call global method
+        return methods[method](this.Store, body)
+      }
+    }
+  }
+  // predefined Vue instances ontions with mixin
+  var vueMixins = [ vueEcom ]
 
   var findChildsByClass = function (doc, className) {
     // returns array of DOM elements
@@ -42,8 +49,6 @@ window.Ecom = (function () {
   }
 
   var render = function (store) {
-    // set current default lang
-    defaultLang = store.lang
     // render store in the HTML DOM
     var doc
     if (store.hasOwnProperty('el')) {
@@ -87,15 +92,16 @@ window.Ecom = (function () {
           }
 
           if (storeApiEndpoint !== undefined) {
-            var resourceId = el.dataset.type
+            var resourceId = el.dataset.id
             callback = function (err, body) {
               if (!err) {
-                var vm = new Vue(Object.assign(vueOptions, {
+                // pass store properties to instance data
+                body.Store = store
+                var vm = new Vue({
+                  'mixins': vueMixins,
                   'el': els[i],
                   'data': body
-                }))
-                // pass store properties to instance data
-                vm.Store = store
+                })
                 // destroy Vue instace after element rendering
                 vm.$destroy()
               }
@@ -116,55 +122,57 @@ window.Ecom = (function () {
     }
   }
 
-  return {
-    'init': function (VueOptions, StoreId, StoreObjectId, Lang) {
-      var i, store
+  methods.init = function (VueMixins, StoreId, StoreObjectId, Lang) {
+    var i, store
 
-      if (StoreId && StoreObjectId) {
-        // set store from function arguments
-        store = {
-          'store_id': parseInt(StoreId, 10),
-          'store_object_id': StoreObjectId
-        }
-        if (Lang) {
-          store.lang = Lang
-        }
-        stores.push(store)
-      } else {
-        // try to set store from HTML DOM
-        var domStores = document.getElementsByClassName('_ecom-store')
-        if (Array.isArray(domStores)) {
-          for (i = 0; i < domStores.length; i++) {
-            var el = domStores[i]
-            store = {
-              'el': el
-            }
-            // check data properties
-            if (el.dataset.store && el.dataset.id) {
-              store.store_id = parseInt(el.dataset.store, 10)
-              store.store_object_id = el.dataset.id
-            }
-            if (el.dataset.lang) {
-              store.lang = el.dataset.lang
-            }
-            stores.push(store)
+    if (StoreId && StoreObjectId) {
+      // set store from function arguments
+      store = {
+        'store_id': parseInt(StoreId, 10),
+        'store_object_id': StoreObjectId
+      }
+      if (Lang) {
+        store.lang = Lang
+      }
+      stores.push(store)
+    } else {
+      // try to set store from HTML DOM
+      var domStores = document.getElementsByClassName('_ecom-store')
+      if (Array.isArray(domStores)) {
+        for (i = 0; i < domStores.length; i++) {
+          var el = domStores[i]
+          store = {
+            'el': el
           }
+          // check data properties
+          if (el.dataset.store && el.dataset.id) {
+            store.store_id = parseInt(el.dataset.store, 10)
+            store.store_object_id = el.dataset.id
+          }
+          if (el.dataset.lang) {
+            store.lang = el.dataset.lang
+          }
+          stores.push(store)
         }
       }
+    }
 
-      if (typeof VueOptions === 'object' && VueOptions !== null) {
-        // set Vue instance options on higher scope
-        vueOptions = Object.assign(vueOptions, VueOptions)
+    if (Array.isArray(VueMixins)) {
+      // merge with predefined mixins on higher scope
+      for (i = 0; i < VueMixins.length; i++) {
+        vueMixins.push(VueMixins[i])
       }
-      // start rendering
-      for (i = 0; i < stores.length; i++) {
-        render(stores[i])
-      }
-    },
-
-    // return current stores array
-    'stores': function () {
-      return stores
+    }
+    // start rendering
+    for (i = 0; i < stores.length; i++) {
+      render(stores[i])
     }
   }
+
+  // return current stores array
+  methods.stores = function () {
+    return stores
+  }
+
+  return methods
 }())
