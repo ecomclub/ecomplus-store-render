@@ -2,11 +2,26 @@ window.Ecom = (function () {
   'use strict'
 
   var stores = []
-  // methods for Vue instances
-  var vueMethods = {
-    'Ecom': {
+  var defaultLang = null
+
+  // predefined Vue instances ontions
+  var vueOptions = {}
+  // create Vue plugin with global methods
+  var EcomVue = {
+    'install': function (Vue) {
+      Vue.prototype.$ecom = {
+        'name': function (item) {
+          // prefer translated item name
+          if (item.hasOwnProperty('i18n') && item.i18n.hasOwnProperty(defaultLang)) {
+            return item.i18n[defaultLang]
+          } else {
+            return item.name
+          }
+        }
+      }
     }
   }
+  Vue.use(EcomVue)
 
   var findChildsByClass = function (doc, className) {
     // returns array of DOM elements
@@ -27,6 +42,8 @@ window.Ecom = (function () {
   }
 
   var render = function (store) {
+    // set current default lang
+    defaultLang = store.lang
     // render store in the HTML DOM
     var doc
     if (store.hasOwnProperty('el')) {
@@ -73,11 +90,10 @@ window.Ecom = (function () {
             var resourceId = el.dataset.type
             callback = function (err, body) {
               if (!err) {
-                var vm = new Vue({
+                var vm = new Vue(Object.assign(vueOptions, {
                   'el': els[i],
-                  'data': body,
-                  'methods': vueMethods
-                })
+                  'data': body
+                }))
                 // pass store properties to instance data
                 vm.Store = store
                 // destroy Vue instace after element rendering
@@ -101,7 +117,7 @@ window.Ecom = (function () {
   }
 
   return {
-    'init': function (VueMethods, StoreId, StoreObjectId, Lang) {
+    'init': function (VueOptions, StoreId, StoreObjectId, Lang) {
       var i, store
 
       if (StoreId && StoreObjectId) {
@@ -136,10 +152,9 @@ window.Ecom = (function () {
         }
       }
 
-      if (typeof VueMethods === 'object' && VueMethods !== null) {
-        // set on higher scope
-        // merge with predefined methods
-        vueMethods = Object.assign(vueMethods, VueMethods)
+      if (typeof VueOptions === 'object' && VueOptions !== null) {
+        // set Vue instance options on higher scope
+        vueOptions = Object.assign(vueOptions, VueOptions)
       }
       // start rendering
       for (i = 0; i < stores.length; i++) {
