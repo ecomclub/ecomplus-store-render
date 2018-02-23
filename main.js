@@ -65,6 +65,7 @@ window.Ecom = (function () {
           }
 
           if (storeApiEndpoint !== undefined) {
+            var resourceId = el.dataset.type
             callback = function (err, body) {
               if (!err) {
                 var vm = new Vue({
@@ -75,7 +76,7 @@ window.Ecom = (function () {
                 vm.$destroy()
               }
             }
-            EcomIo.getById(callback, storeApiEndpoint, '123a5432109876543210cdef')
+            EcomIo.getById(callback, storeApiEndpoint, resourceId)
           }
         }
       } else {
