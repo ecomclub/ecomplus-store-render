@@ -109,6 +109,8 @@ window.Ecom = (function () {
                   })
                   // destroy Vue instace after element rendering
                   vm.$destroy()
+                  // mark element as rendered
+                  el.classList.add('rendered')
                 } else {
                   console.error(err)
                 }
