@@ -22,7 +22,7 @@ window.Ecom = (function () {
   for (var method in methods) {
     if (methods.hasOwnProperty(method)) {
       vueEcom.methods[method] = function (body) {
-        if (body === undefined) {
+        if (!body) {
           // send instance data
           body = this.$data
         }
@@ -76,7 +76,7 @@ window.Ecom = (function () {
         var els = findChildsByClass(doc, '_ecom-el')
         for (var i = 0; i < els.length; i++) {
           var el = els[i]
-          var storeApiEndpoint
+          var resource
           var callback
           switch (el.dataset.type) {
             case 'product':
@@ -88,29 +88,53 @@ window.Ecom = (function () {
             case 'application':
             case 'store':
               // eg.: products
-              storeApiEndpoint = el.dataset.type + 's'
+              resource = el.dataset.type + 's'
               break
             case 'category':
-              storeApiEndpoint = el.dataset.type.slice(0, -1) + 'ies'
+              resource = el.dataset.type.slice(0, -1) + 'ies'
               break
           }
 
-          if (storeApiEndpoint !== undefined) {
+          if (resource !== undefined) {
             var resourceId = el.dataset.id
-            callback = function (err, body) {
-              if (!err) {
-                // pass store properties to instance data
-                body.Store = store
-                var vm = new Vue({
-                  'mixins': vueMixins,
-                  'el': els[i],
-                  'data': body
-                })
-                // destroy Vue instace after element rendering
-                vm.$destroy()
+            var Render = function () {
+              callback = function (err, body) {
+                if (!err) {
+                  // pass store properties to instance data
+                  body.Store = store
+                  var vm = new Vue({
+                    'mixins': vueMixins,
+                    'el': el,
+                    'data': body
+                  })
+                  // destroy Vue instace after element rendering
+                  vm.$destroy()
+                } else {
+                  console.error(err)
+                }
               }
+              EcomIo.getById(callback, resource, resourceId)
             }
-            EcomIo.getById(callback, storeApiEndpoint, resourceId)
+
+            if (!resourceId) {
+              // get resource ID by current URI
+              EcomIo.mapByWindowUri(function (err, body) {
+                if (!err) {
+                  if (resource === body.resource) {
+                    resourceId = body._id
+                    Render()
+                  }
+                } else {
+                  console.error(err)
+                }
+              })
+            } else {
+              // resource ID defined by element data
+              Render()
+            }
+          } else {
+            console.log('Ignored element (invalid type):')
+            console.log(el)
           }
         }
       } else {
