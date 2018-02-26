@@ -123,6 +123,9 @@ window.Ecom = (function () {
                   if (resource === body.resource) {
                     resourceId = body._id
                     Render()
+                  } else {
+                    console.log('Ignored element, id undefined and type does not match with URI resource:')
+                    console.log(el)
                   }
                 } else {
                   console.error(err)
@@ -133,7 +136,7 @@ window.Ecom = (function () {
               Render()
             }
           } else {
-            console.log('Ignored element (invalid type):')
+            console.log('Ignored element, invalid type:')
             console.log(el)
           }
         }
