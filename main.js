@@ -143,6 +143,7 @@ window.Ecom = (function () {
           }
         }
       } else {
+        console.error(err)
       }
     }
 
