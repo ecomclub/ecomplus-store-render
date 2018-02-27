@@ -7,8 +7,9 @@ window.Ecom = (function () {
   var methods = {
     'name': function (store, body) {
       // prefer translated item name
-      if (store.hasOwnProperty('lang') && body.hasOwnProperty('i18n') && body.i18n.hasOwnProperty(store.lang)) {
-        return body.i18n[store.lang]
+      var lang = store.lang
+      if (lang && body.hasOwnProperty('i18n') && body.i18n.hasOwnProperty(lang)) {
+        return body.i18n[lang]
       } else {
         return body.name
       }
