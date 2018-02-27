@@ -35,19 +35,34 @@ window.Ecom = (function () {
   // predefined Vue instances ontions with mixin
   var vueMixins = [ vueEcom ]
 
-  var findChildsByClass = function (doc, className) {
+  var findChildsByClass = function (doc, className, els, deep) {
     // returns array of DOM elements
-    var els = []
-    for (var i = 0; i < doc.childNodes.length; i++) {
-      var classes = doc.childNodes[i].classList
-      if (Array.isArray(classes)) {
-        for (var ii = 0; ii < classes.length; ii++) {
-          if (classes[ii] === className) {
-            // match
-            els.push(doc.childNodes[i])
-            break
+    if (!Array.isArray(els)) {
+      els = []
+      // count number of parents until the doc element
+      if (!deep) {
+        deep = 0
+      }
+    }
+
+    if (doc.childNodes) {
+      for (var i = 0; i < doc.childNodes.length; i++) {
+        var el = doc.childNodes[i]
+        var classes = el.classList
+        if (classes) {
+          for (var ii = 0; ii < classes.length; ii++) {
+            if (classes[ii] === className) {
+              // match
+              el.deep = deep
+              els.push(el)
+              break
+            }
           }
         }
+
+        // go deeper
+        // recursive function
+        findChildsByClass(el, className, els, deep + 1)
       }
     }
     return els
@@ -75,6 +90,12 @@ window.Ecom = (function () {
         // render elements
         // https://developers.e-com.plus/ecomplus-store-template/#vue-instances
         var els = findChildsByClass(doc, '_ecom-el')
+        // order elements by number of parents
+        // deeper first
+        els.sort(function (x, y) {
+          return y.deep - x.deep
+        })
+
         for (var i = 0; i < els.length; i++) {
           var el = els[i]
           var resource
