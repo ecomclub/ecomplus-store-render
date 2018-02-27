@@ -80,6 +80,8 @@ window.Ecom = (function () {
 
     var callback = function (err, body) {
       if (!err) {
+        var i, el
+
         if (typeof body === 'object' && body !== null) {
           // returned body from domains resource of Main API
           // http://ecomplus.docs.apiary.io/
@@ -96,10 +98,29 @@ window.Ecom = (function () {
           return y.deep - x.deep
         })
 
-        for (var i = 0; i < els.length; i++) {
-          var el = els[i]
-          var resource
-          var callback
+        // resources queue
+        var queue = {}
+        var resourceId
+        var resource
+        var toQueue = function () {
+          if (queue.hasOwnProperty(resourceId)) {
+            if (queue[resourceId].resource === resource) {
+              queue[resourceId].els.push(el)
+            } else {
+              console.log('Ignored element, different types for same id (?):')
+              console.log(el)
+            }
+          } else {
+            // set on queue
+            queue[resourceId] = {
+              'resource': resource,
+              'els': [ el ]
+            }
+          }
+        }
+
+        for (i = 0; i < els.length; i++) {
+          el = els[i]
           switch (el.dataset.type) {
             case 'product':
             case 'brand':
@@ -118,35 +139,14 @@ window.Ecom = (function () {
           }
 
           if (resource !== undefined) {
-            var resourceId = el.dataset.id
-            var Render = function () {
-              callback = function (err, body) {
-                if (!err) {
-                  // pass store properties to instance data
-                  body.Store = store
-                  var vm = new Vue({
-                    'mixins': vueMixins,
-                    'el': el,
-                    'data': body
-                  })
-                  // destroy Vue instace after element rendering
-                  vm.$destroy()
-                  // mark element as rendered
-                  el.classList.add('rendered')
-                } else {
-                  console.error(err)
-                }
-              }
-              EcomIo.getById(callback, resource, resourceId)
-            }
-
+            resourceId = el.dataset.id
             if (!resourceId) {
               // get resource ID by current URI
               EcomIo.mapByWindowUri(function (err, body) {
                 if (!err) {
                   if (resource === body.resource) {
                     resourceId = body._id
-                    Render()
+                    toQueue()
                   } else {
                     console.log('Ignored element, id undefined and type does not match with URI resource:')
                     console.log(el)
@@ -157,11 +157,29 @@ window.Ecom = (function () {
               })
             } else {
               // resource ID defined by element data
-              Render()
+              toQueue()
             }
           } else {
             console.log('Ignored element, invalid type:')
             console.log(el)
+          }
+        }
+
+        // run queue
+        for (resourceId in queue) {
+          if (queue.hasOwnProperty(resourceId)) {
+            var get = queue[resourceId]
+            callback = function (err, body) {
+              if (!err) {
+                els = get.els
+                for (i = 0; i < els.length; i++) {
+                  renderElement(store, els[i], body)
+                }
+              } else {
+                console.error(err)
+              }
+            }
+            EcomIo.getById(callback, get.resource, resourceId)
           }
         }
       } else {
@@ -176,6 +194,20 @@ window.Ecom = (function () {
       // set store in function of site domain name
       EcomIo.init(callback)
     }
+  }
+
+  var renderElement = function (store, el, body) {
+    // pass store properties to instance data
+    body.Store = store
+    var vm = new Vue({
+      'mixins': vueMixins,
+      'el': el,
+      'data': body
+    })
+    // destroy Vue instace after element rendering
+    vm.$destroy()
+    // mark element as rendered
+    el.classList.add('rendered')
   }
 
   methods.init = function (VueMixins, StoreId, StoreObjectId, Lang) {
