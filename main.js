@@ -3,34 +3,51 @@ window.Ecom = (function () {
 
   var stores = []
 
+  // auxiliaries
+  var splitImgSize = function (imgBody, index) {
+    if (imgBody.hasOwnProperty('size')) {
+      var sizes = imgBody.size.split('x')
+      if (sizes.length === 2) {
+        return sizes[index]
+      }
+    }
+    return null
+  }
+
   // global Ecom utility methods
   var methods = {
-    'name': function (store, body) {
+    'name': function (body, lang) {
+      if (typeof this === 'object' && this !== null && this.Store) {
+        // this is the Vue instance
+        if (!body) {
+          // send instance data
+          body = this.$data
+        }
+        if (!lang) {
+          // default store lang
+          lang = this.Store.lang
+        }
+      }
       // prefer translated item name
-      var lang = store.lang
       if (lang && body.hasOwnProperty('i18n') && body.i18n.hasOwnProperty(lang)) {
         return body.i18n[lang]
       } else {
         return body.name
       }
+    },
+
+    // image sizing
+    'width': function (imgBody) {
+      splitImgSize(imgBody, 0)
+    },
+    'height': function (imgBody) {
+      splitImgSize(imgBody, 1)
     }
   }
 
   // Ecom methods for Vue instance
   var vueEcom = {
-    'methods': {}
-  }
-  for (var method in methods) {
-    if (methods.hasOwnProperty(method)) {
-      vueEcom.methods[method] = function (body) {
-        if (!body) {
-          // send instance data
-          body = this.$data
-        }
-        // call global method
-        return methods[method](this.Store, body)
-      }
-    }
+    'methods': methods
   }
   // predefined Vue instances ontions with mixin
   var vueMixins = [ vueEcom ]
