@@ -1,6 +1,6 @@
 {
   "name": "ecomplus-render",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "Vue.js app (frontend) to render E-Com Plus store template",
   "main": "index.js",
   "scripts": {
