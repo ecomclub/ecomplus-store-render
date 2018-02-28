@@ -3,31 +3,32 @@ window.Ecom = (function () {
 
   var stores = []
 
-  // auxiliaries
+  /* auxiliary methods */
+
   var splitImgSize = function (imgBody, index) {
-    if (imgBody.hasOwnProperty('size')) {
-      var sizes = imgBody.size.split('x')
-      if (sizes.length === 2) {
-        return sizes[index]
+    if (typeof imgBody === 'object' && imgBody !== null) {
+      if (imgBody.hasOwnProperty('size')) {
+        var sizes = imgBody.size.split('x')
+        if (sizes.length === 2) {
+          return sizes[index]
+        }
+      } else {
+        // try with 'logo' body property by default
+        return splitImgSize(imgBody.logo)
       }
     }
     return null
   }
 
-  // global Ecom utility methods
+  // Ecom utility methods
   var methods = {
     'name': function (body, lang) {
-      if (typeof this === 'object' && this !== null && this.Store) {
+      if (!lang && typeof this === 'object' && this !== null && this.Store) {
         // this is the Vue instance
-        if (!body) {
-          // send instance data
-          body = this.$data
-        }
-        if (!lang) {
-          // default store lang
-          lang = this.Store.lang
-        }
+        // default store lang
+        lang = this.Store.lang
       }
+
       // prefer translated item name
       if (lang && body.hasOwnProperty('i18n') && body.i18n.hasOwnProperty(lang)) {
         return body.i18n[lang]
@@ -36,18 +37,87 @@ window.Ecom = (function () {
       }
     },
 
-    // image sizing
     'width': function (imgBody) {
+      // returns image width in px from size string
       splitImgSize(imgBody, 0)
     },
+
     'height': function (imgBody) {
+      // returns image height from size string
       splitImgSize(imgBody, 1)
+    },
+
+    'price': function (body) {
+      // prefer promotional price
+      if (!methods.onPromotion(body) && body.hasOwnProperty('base_price')) {
+        return body.base_price
+      } else {
+        // sale price
+        return body.price
+      }
+    },
+
+    'formatMoney': function (price, decimal, thousands, numFixed) {
+      // set defaults
+      if (!decimal) {
+        decimal = ','
+      }
+      if (!thousands) {
+        thousands = '.'
+      }
+      if (!numFixed) {
+        numFixed = 2
+      }
+
+      // price to number
+      if (typeof price === 'object') {
+        if (price !== null) {
+          // suppose to be product object
+          price = price.price
+        }
+      } else if (typeof price === 'string') {
+        price = parseFloat(price)
+      }
+      // format price string
+      if (typeof price === 'number' && !isNaN(price)) {
+        return price.toFixed(numFixed).replace(thousands, decimal).replace(/(\d)(?=(\d{3})+,)/g, '$1.')
+      } else {
+        // eg.: 0,00
+        var zero = '0' + decimal
+        for (var i = 0; i < numFixed; i++) {
+          zero += '0'
+        }
+        return zero
+      }
+    },
+
+    'onPromotion': function (body) {
     }
   }
 
   // Ecom methods for Vue instance
   var vueEcom = {
-    'methods': methods
+    'methods': {}
+  }
+  for (var method in methods) {
+    if (methods.hasOwnProperty(method)) {
+      vueEcom.methods[method] = function () {
+        // convert arguments array-like object to array
+        var args = []
+        for (var i = 0; i < arguments.length; i++) {
+          args.push(arguments[i])
+        }
+        if (!args[0]) {
+          // body
+          // send instance data
+          args[0] = this.$data
+        }
+
+        // call global method
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply
+        return methods[method].apply(null, args)
+      }
+    }
   }
   // predefined Vue instances ontions with mixin
   var vueMixins = [ vueEcom ]
