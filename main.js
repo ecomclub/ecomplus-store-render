@@ -255,20 +255,26 @@ window.Ecom = (function () {
           if (resource !== undefined) {
             resourceId = el.dataset.id
             if (!resourceId) {
-              // get resource ID by current URI
-              EcomIo.mapByWindowUri(function (err, body) {
-                if (!err) {
-                  if (resource === body.resource) {
-                    resourceId = body._id
-                    toQueue()
+              if (resource === 'stores') {
+                // get current store info
+                resourceId = store.store_object_id
+                toQueue()
+              } else {
+                // get resource ID by current URI
+                EcomIo.mapByWindowUri(function (err, body) {
+                  if (!err) {
+                    if (resource === body.resource) {
+                      resourceId = body._id
+                      toQueue()
+                    } else {
+                      console.log('Ignored element, id undefined and type does not match with URI resource:')
+                      console.log(el)
+                    }
                   } else {
-                    console.log('Ignored element, id undefined and type does not match with URI resource:')
-                    console.log(el)
+                    console.error(err)
                   }
-                } else {
-                  console.error(err)
-                }
-              })
+                })
+              }
             } else {
               // resource ID defined by element data
               toQueue()
