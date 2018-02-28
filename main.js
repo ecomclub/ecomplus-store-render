@@ -49,11 +49,11 @@ window.Ecom = (function () {
 
     'price': function (body) {
       // prefer promotional price
-      if (!methods.onPromotion(body) && body.hasOwnProperty('base_price')) {
-        return body.base_price
-      } else {
+      if (body.hasOwnProperty('price')) {
         // sale price
         return body.price
+      } else {
+        return body.base_price
       }
     },
 
@@ -92,6 +92,42 @@ window.Ecom = (function () {
     },
 
     'onPromotion': function (body) {
+      if (body.hasOwnProperty('price_effective_date')) {
+        var now = new Date()
+        if (body.price_effective_date.hasOwnProperty('start')) {
+          // start date and time in ISO 8601
+          if (new Date(body.price_effective_date.start) < now) {
+            return false
+          }
+        }
+        if (body.price_effective_date.hasOwnProperty('end')) {
+          // promotion end date and time in ISO 8601
+          if (new Date(body.price_effective_date.end) > now) {
+            return false
+          }
+        }
+      }
+
+      if (body.price && body.base_price) {
+        return true
+      }
+      // default to no promotion
+      return false
+    },
+
+    'alphabeticalSort': function (list) {
+      // must be an array
+      if (Array.isArray(list)) {
+        // try to sort by name
+        list.sort(function (a, b) {
+          if (a.name < b.name) return -1
+          return 1
+        })
+      } else if (typeof list === 'object' && list !== null) {
+        // suppose to be a list all request body
+        return methods.alphabeticalSort(list.results)
+      }
+      return list
     }
   }
 
