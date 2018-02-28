@@ -291,6 +291,7 @@ window.Ecom = (function () {
   methods.init = function (VueMixins, StoreId, StoreObjectId, Lang) {
     var i, store
 
+    console.log('Init E-Com Plus storefront rendering')
     if (StoreId && StoreObjectId) {
       // set store from function arguments
       store = {
@@ -304,7 +305,7 @@ window.Ecom = (function () {
     } else {
       // try to set store from HTML DOM
       var domStores = document.getElementsByClassName('_ecom-store')
-      if (Array.isArray(domStores)) {
+      if (typeof domStores === 'object' && domStores !== null) {
         for (i = 0; i < domStores.length; i++) {
           var el = domStores[i]
           store = {
