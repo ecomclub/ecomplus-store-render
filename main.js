@@ -324,7 +324,9 @@ window.Ecom = (function () {
     var vm = new Vue({
       'mixins': vueMixins,
       'el': el,
-      'data': body
+      'data': {
+        'body': body
+      }
     })
     // destroy Vue instace after element rendering
     vm.$destroy()
