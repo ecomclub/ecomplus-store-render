@@ -303,9 +303,11 @@ window.Ecom = (function () {
 
     // initialize storefront SDK
     if (store.hasOwnProperty('store_id') && store.hasOwnProperty('store_object_id')) {
+      console.log('Init storefront SDK for #' + store.store_id)
       EcomIo.init(callback, store.store_id, store.store_object_id)
     } else {
       // set store in function of site domain name
+      console.log('Init storefront SDK for self host')
       EcomIo.init(callback)
     }
   }
@@ -327,7 +329,7 @@ window.Ecom = (function () {
   methods.init = function (VueMixins, StoreId, StoreObjectId, Lang) {
     var i, store
 
-    console.log('Init E-Com Plus storefront rendering')
+    console.log('Init E-Com Plus store rendering')
     if (StoreId && StoreObjectId) {
       // set store from function arguments
       store = {
