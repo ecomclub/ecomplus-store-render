@@ -216,18 +216,28 @@ window.Ecom = (function () {
         var queue = {}
         var resourceId
         var resource
-        var toQueue = function () {
-          if (queue.hasOwnProperty(resourceId)) {
-            if (queue[resourceId].resource === resource) {
-              queue[resourceId].els.push(el)
+        var toQueue = function (listAll) {
+          var index
+          if (!listAll) {
+            index = resourceId
+          } else {
+            // list all resource objects
+            // no resource ID
+            index = resource
+          }
+
+          if (queue.hasOwnProperty(index)) {
+            if (queue[index].resource === resource) {
+              queue[index].els.push(el)
             } else {
               console.log('Ignored element, different types for same id (?):')
               console.log(el)
             }
           } else {
             // set on queue
-            queue[resourceId] = {
+            queue[index] = {
               'resource': resource,
+              'list': listAll,
               'els': [ el ]
             }
           }
@@ -259,6 +269,9 @@ window.Ecom = (function () {
                 // get current store info
                 resourceId = store.store_object_id
                 toQueue()
+              } else if (el.dataset.hasOwnProperty('listAll')) {
+                // list all objects
+                toQueue(true)
               } else {
                 // get resource ID by current URI
                 EcomIo.mapByWindowUri(function (err, body) {
@@ -289,6 +302,8 @@ window.Ecom = (function () {
         for (resourceId in queue) {
           if (queue.hasOwnProperty(resourceId)) {
             var get = queue[resourceId]
+            resource = get.resource
+
             callback = function (err, body) {
               if (!err) {
                 els = get.els
@@ -299,7 +314,20 @@ window.Ecom = (function () {
                 console.error(err)
               }
             }
-            EcomIo.getById(callback, get.resource, resourceId)
+
+            if (!get.list) {
+              EcomIo.getById(callback, resource, resourceId)
+            } else {
+              // list all resource objects
+              // no resource ID
+              var ioMethod = 'list' + resource.charAt(0).toUpperCase() + resource.slice(1)
+              if (EcomIo.hasOwnProperty(ioMethod)) {
+                EcomIo[ioMethod](callback)
+              } else {
+                console.log('Ignored element, list all unavailable for this resource:')
+                console.log(el)
+              }
+            }
           }
         }
       } else {
@@ -309,11 +337,10 @@ window.Ecom = (function () {
 
     // initialize storefront SDK
     if (store.hasOwnProperty('store_id') && store.hasOwnProperty('store_object_id')) {
-      console.log('Init storefront SDK for #' + store.store_id)
+      // console.log('Init storefront SDK for #' + store.store_id)
       EcomIo.init(callback, store.store_id, store.store_object_id)
     } else {
       // set store in function of site domain name
-      console.log('Init storefront SDK for self host')
       EcomIo.init(callback)
     }
   }
