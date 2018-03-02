@@ -304,16 +304,19 @@ window.Ecom = (function () {
             var get = queue[resourceId]
             resource = get.resource
 
-            callback = function (err, body) {
-              if (!err) {
-                els = get.els
-                for (i = 0; i < els.length; i++) {
-                  renderElement(store, els[i], body)
+            var callback = (function () {
+              // scoped
+              var els = get.els
+              return function (err, body) {
+                if (!err) {
+                  for (i = 0; i < els.length; i++) {
+                    renderElement(store, els[i], body)
+                  }
+                } else {
+                  console.error(err)
                 }
-              } else {
-                console.error(err)
               }
-            }
+            }())
 
             if (!get.list) {
               EcomIo.getById(callback, resource, resourceId)
