@@ -359,6 +359,7 @@ window.Ecom = (function () {
       },
       'destroyed': function () {
         // mark element as rendered
+        console.log(el)
         el.classList.add('rendered')
       }
     })
