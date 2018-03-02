@@ -356,12 +356,14 @@ window.Ecom = (function () {
       'el': el,
       'data': {
         'body': body
+      },
+      'destroyed': function () {
+        // mark element as rendered
+        el.classList.add('rendered')
       }
     })
     // destroy Vue instace after element rendering
     vm.$destroy()
-    // mark element as rendered
-    el.classList.add('rendered')
   }
 
   methods.init = function (VueMixins, StoreId, StoreObjectId, Lang) {
