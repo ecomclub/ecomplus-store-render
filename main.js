@@ -423,20 +423,25 @@ window.Ecom = (function () {
                 // preset object
                 arg.specs = {}
               }
-              var spec = el.dataset[data]
-              if (spec.charCodeAt(0) === '[') {
+              // lowercase specification name
+              // eg.: specColors -> colors
+              var spec = data.charAt(4).toLowerCase() + data.substr(5)
+              // specification value
+              var value = el.dataset[data]
+
+              if (value.charAt(0) === '[') {
                 // can be a JSON array
                 try {
-                  var array = JSON.parse(spec)
+                  var array = JSON.parse(value)
                   if (Array.isArray(array)) {
-                    arg.specs[data] = array
+                    arg.specs[spec] = array
                   }
                 } catch (e) {
                   // continue only
                 }
               }
-              if (!arg.specs.hasOwnProperty(data)) {
-                arg.specs[data] = [ spec ]
+              if (!arg.specs.hasOwnProperty(spec)) {
+                arg.specs[spec] = [ value ]
               }
             }
         }
