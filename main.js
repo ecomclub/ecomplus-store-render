@@ -241,37 +241,37 @@ window.Ecom = (function () {
               searchItems(store, el)
               skip = true
               break
+
+            default:
+              console.log('Ignored element, invalid type:')
+              console.log(el)
+              skip = true
           }
           if (skip === true) {
             continue
           }
 
-          if (resource !== undefined) {
-            // preset defaults
-            listAll = currentId = false
-            // try to define resource ID by element data
-            resourceId = el.dataset.id
-            if (!resourceId) {
-              if (resource === 'stores') {
-                // get current store info
-                resourceId = store.store_object_id
-              } else if (el.dataset.hasOwnProperty('listAll')) {
-                // list all objects
-                listAll = true
-              } else {
-                // use object of current URI
-                if (!getCurrentObj) {
-                  getCurrentObj = true
-                }
-                currentId = true
+          // preset defaults
+          listAll = currentId = false
+          // try to define resource ID by element data
+          resourceId = el.dataset.id
+          if (!resourceId) {
+            if (resource === 'stores') {
+              // get current store info
+              resourceId = store.store_object_id
+            } else if (el.dataset.hasOwnProperty('listAll')) {
+              // list all objects
+              listAll = true
+            } else {
+              // use object of current URI
+              if (!getCurrentObj) {
+                getCurrentObj = true
               }
+              currentId = true
             }
-
-            addToQueue(queue, el, resource, resourceId, listAll, currentId)
-          } else {
-            console.log('Ignored element, invalid type:')
-            console.log(el)
           }
+
+          addToQueue(queue, el, resource, resourceId, listAll, currentId)
         }
 
         if (getCurrentObj === true) {
