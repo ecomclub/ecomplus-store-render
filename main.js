@@ -342,7 +342,27 @@ window.Ecom = (function () {
           return function (err, body) {
             if (!err) {
               for (var i = 0; i < els.length; i++) {
-                renderElement(store, els[i], body)
+                var el = els[i]
+
+                if (el.dataset.hasOwnProperty('list')) {
+                  // search items by IDs from resource field
+                  var field = el.dataset.list
+                  if (body.hasOwnProperty(field)) {
+                    var ids = body[field]
+                    // set data-ids
+                    if (Array.isArray(ids)) {
+                      // implode array with separator ,
+                      el.dataset.ids = ids.join()
+                    } else if (typeof ids === 'string') {
+                      // expect that the string already is a valid product object ID
+                      el.dataset.ids = ids
+                    }
+                  }
+                  searchItems(store, el, body)
+                } else {
+                  // simple Store API object
+                  renderElement(store, el, body)
+                }
               }
             } else {
               console.error(err)
@@ -376,7 +396,7 @@ window.Ecom = (function () {
     }
   }
 
-  var searchItems = function (store, el) {
+  var searchItems = function (store, el, presetBody) {
     // check for search arguments
     var arg = {}
     for (var data in el.dataset) {
@@ -452,6 +472,11 @@ window.Ecom = (function () {
     EcomIo.searchProducts(function (err, body) {
       if (!err) {
         console.log(body)
+        if (typeof presetBody === 'object' && presetBody !== null) {
+          // some Store API resource body
+          // merge with Search API response
+          body = Object.assign(presetBody, body)
+        }
         renderElement(store, el, body)
       } else {
         console.error(err)
