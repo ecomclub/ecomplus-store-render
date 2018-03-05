@@ -218,6 +218,7 @@ window.Ecom = (function () {
 
         for (i = 0; i < els.length; i++) {
           el = els[i]
+          var skip = false
           switch (el.dataset.type) {
             case 'product':
             case 'brand':
@@ -230,9 +231,19 @@ window.Ecom = (function () {
               // eg.: products
               resource = el.dataset.type + 's'
               break
+
             case 'category':
               resource = el.dataset.type.slice(0, -1) + 'ies'
               break
+
+            case 'items':
+              // Search API
+              searchItems(store, el)
+              skip = true
+              break
+          }
+          if (skip === true) {
+            continue
           }
 
           if (resource !== undefined) {
@@ -363,6 +374,84 @@ window.Ecom = (function () {
         }
       }
     }
+  }
+
+  var searchItems = function (store, el) {
+    // check for search arguments
+    var arg = {}
+    for (var data in el.dataset) {
+      if (el.dataset.hasOwnProperty(data)) {
+        switch (data) {
+          case 'term':
+            arg[data] = el.dataset[data]
+            break
+
+          case 'from':
+          case 'size':
+          case 'sort':
+            arg[data] = parseInt(el.dataset[data], 10)
+            break
+
+          case 'ids':
+          case 'brands':
+          case 'categories':
+            // list separated by ,
+            // to array
+            arg[data] = el.dataset[data].split(',')
+            break
+
+          case 'priceMin':
+            if (!arg.hasOwnProperty('prices')) {
+              // preset object
+              arg.prices = {}
+            }
+            arg.prices.min = parseFloat(el.dataset[data])
+            break
+
+          case 'priceMax':
+            if (!arg.hasOwnProperty('prices')) {
+              // preset object
+              arg.prices = {}
+            }
+            arg.prices.max = parseFloat(el.dataset[data])
+            break
+
+          default:
+            // check specs
+            if (data.startsWith('spec')) {
+              if (!arg.hasOwnProperty('specs')) {
+                // preset object
+                arg.specs = {}
+              }
+              var spec = el.dataset[data]
+              if (spec.charCodeAt(0) === '[') {
+                // can be a JSON array
+                try {
+                  var array = JSON.parse(spec)
+                  if (Array.isArray(array)) {
+                    arg.specs[data] = array
+                  }
+                } catch (e) {
+                  // continue only
+                }
+              }
+              if (!arg.specs.hasOwnProperty(data)) {
+                arg.specs[data] = [ spec ]
+              }
+            }
+        }
+      }
+    }
+
+    // call Search API
+    EcomIo.searchProducts(function (err, body) {
+      if (!err) {
+        console.log(body)
+        renderElement(store, el, body)
+      } else {
+        console.error(err)
+      }
+    }, arg.term, arg.from, arg.size, arg.sort, arg.specs, arg.ids, arg.brands, arg.categories, arg.prices)
   }
 
   var renderElement = function (store, el, body) {
