@@ -486,7 +486,7 @@ window.Ecom = (function () {
     // call Search API
     EcomIo.searchProducts(function (err, body) {
       if (!err) {
-        console.log(body)
+        // console.log(body)
         if (typeof presetBody === 'object' && presetBody !== null) {
           // some Store API resource body
           // merge with Search API response
