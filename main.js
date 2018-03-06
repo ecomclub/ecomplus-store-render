@@ -23,7 +23,6 @@ window.Ecom = (function () {
   // Ecom utility methods
   var methods = {
     'name': function (body, lang) {
-      console.log(arguments)
       if (!lang && typeof this === 'object' && this !== null && this.Store) {
         // this is the Vue instance
         // default store lang
@@ -138,26 +137,27 @@ window.Ecom = (function () {
   }
   for (var method in methods) {
     if (methods.hasOwnProperty(method)) {
-      vueEcom.methods[method] = function () {
-        // convert arguments array-like object to array
-        var args = []
-        for (var i = 0; i < arguments.length; i++) {
-          args.push(arguments[i])
-        }
-        if (!args[0]) {
-          // body
-          // send instance data
-          args[0] = this.$data
-        }
+      vueEcom.methods[method] = (function () {
+        // scoped
+        var Method = methods[method]
 
-        // call global method
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply
-        var x = methods[method].apply(null, args)
-        console.log(methods[method])
-        console.log(x)
-        methods[method].apply(this, args)
-        return x
-      }
+        return function () {
+          // convert arguments array-like object to array
+          var args = []
+          for (var i = 0; i < arguments.length; i++) {
+            args.push(arguments[i])
+          }
+          if (!args[0]) {
+            // body
+            // send instance data
+            args[0] = this.$data
+          }
+
+          // call global method
+          // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply
+          return Method.apply(null, args)
+        }
+      }())
     }
   }
   // predefined Vue instances ontions with mixin
