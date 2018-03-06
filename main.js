@@ -23,6 +23,7 @@ window.Ecom = (function () {
   // Ecom utility methods
   var methods = {
     'name': function (body, lang) {
+      console.log(arguments)
       if (!lang && typeof this === 'object' && this !== null && this.Store) {
         // this is the Vue instance
         // default store lang
