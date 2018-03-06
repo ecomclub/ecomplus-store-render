@@ -149,8 +149,8 @@ window.Ecom = (function () {
           }
           if (!args[0]) {
             // body
-            // send instance data
-            args[0] = this.$data
+            // send from instance data
+            args[0] = this.$data.body
           }
 
           // call global method
