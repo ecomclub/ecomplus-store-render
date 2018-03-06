@@ -153,6 +153,7 @@ window.Ecom = (function () {
         // call global method
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply
         var x = methods[method].apply(null, args)
+        console.log(methods[method])
         console.log(x)
         methods[method].apply(this, args)
         return x
