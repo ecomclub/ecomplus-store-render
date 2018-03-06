@@ -29,6 +29,8 @@ window.Ecom = (function () {
         lang = this.Store.lang
       }
 
+      console.log(body)
+      console.log(lang)
       // prefer translated item name
       if (lang && body.hasOwnProperty('i18n') && body.i18n.hasOwnProperty(lang)) {
         return body.i18n[lang]
