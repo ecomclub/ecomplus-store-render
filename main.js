@@ -158,6 +158,14 @@ window.Ecom = (function () {
   // predefined Vue instances ontions with mixin
   var vueMixins = [ vueEcom ]
 
+  // config Vue globally
+  Vue.config.errorHandler = function (err, vm, info) {
+    // identify the instance
+    console.log(vm.$el)
+    console.log(vm.$data)
+    throw err
+  }
+
   var findChildsByClass = function (doc, className, els) {
     // returns array of DOM elements
     if (!Array.isArray(els)) {
