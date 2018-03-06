@@ -159,11 +159,13 @@ window.Ecom = (function () {
   var vueMixins = [ vueEcom ]
 
   // config Vue globally
-  Vue.config.errorHandler = function (e, vm, info) {
-    // error already throwed by Vue
+  Vue.config.errorHandler = function (err, vm, info) {
+    console.error(err)
     // identify the instance
+    console.log('Vue instance with error, $el and $data:')
     console.log(vm.$el)
     console.log(vm.$data)
+    console.log('-----//-----')
   }
 
   var findChildsByClass = function (doc, className, els) {
