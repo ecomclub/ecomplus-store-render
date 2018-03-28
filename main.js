@@ -66,7 +66,7 @@ window.Ecom = (function () {
         } else {
           min = 1
         }
-        if (body.quantity > min) {
+        if (body.quantity >= min) {
           // in stock
           return true
         }
