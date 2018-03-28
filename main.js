@@ -57,25 +57,24 @@ window.Ecom = (function () {
       }
     },
 
-    'available': function (body) {
-      // check availability and inventory
-      if (body.available) {
-        if (body.hasOwnProperty('quantity')) {
-          var min
-          if (body.hasOwnProperty('min_quantity')) {
-            min = body.min_quantity
-          } else {
-            min = 1
-          }
-          if (body.quantity > min) {
-            // in stock
-            return true
-          }
+    'inStock': function (body) {
+      // check inventory
+      if (body.hasOwnProperty('quantity')) {
+        var min
+        if (body.hasOwnProperty('min_quantity')) {
+          min = body.min_quantity
         } else {
-          // no stock control
+          min = 1
+        }
+        if (body.quantity > min) {
+          // in stock
           return true
         }
+      } else {
+        // no stock control
+        return true
       }
+      // out of stock
       return false
     },
 
