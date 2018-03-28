@@ -57,6 +57,28 @@ window.Ecom = (function () {
       }
     },
 
+    'available': function (body) {
+      // check availability and inventory
+      if (body.available) {
+        if (body.hasOwnProperty('quantity')) {
+          var min
+          if (body.hasOwnProperty('min_quantity')) {
+            min = body.min_quantity
+          } else {
+            min = 1
+          }
+          if (body.quantity > min) {
+            // in stock
+            return true
+          }
+        } else {
+          // no stock control
+          return true
+        }
+      }
+      return false
+    },
+
     'formatMoney': function (price, decimal, thousands, numFixed) {
       // set defaults
       if (!decimal) {
