@@ -242,6 +242,10 @@ window.Ecom = (function () {
           // http://ecomplus.docs.apiary.io/
           store.store_id = body.store_id
           store.store_object_id = body.store_object_id
+          if (!store.lang && body.default_lang) {
+            // use domain default language
+            store.lang = body.default_lang
+          }
         }
 
         // render elements
