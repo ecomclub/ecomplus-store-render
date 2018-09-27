@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/ecomplus-render.svg)](https://www.npmjs.org/ecomplus-render)
 [![license mit](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Vue.js app (frontend) to render E-Com Plus store template.
+Vue.js app to render E-Com Plus store template.
 
 It **requires** global `EcomIo` object from
 [storefront JS SDK](https://github.com/ecomclub/ecomplus-sdk-js).

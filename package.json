@@ -1,7 +1,7 @@
 {
   "name": "ecomplus-render",
   "version": "1.11.0",
-  "description": "Vue.js app (frontend) to render E-Com Plus store template",
+  "description": "Vue.js app to render E-Com Plus store template",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
