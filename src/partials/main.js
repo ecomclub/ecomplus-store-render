@@ -49,6 +49,7 @@
     console.log('Vue instance with error, $el and $data:')
     console.log(vm.$el)
     console.log(vm.$data)
+    console.log(info)
     console.log('-----//-----')
   }
 
