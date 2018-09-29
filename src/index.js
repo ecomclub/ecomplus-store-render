@@ -10,10 +10,12 @@ var __ecom = {};
 (function () {
   'use strict'
 
-  // Handle compatibility with Node.js, RequireJS as well as without them
-  // No bundlers or transpilers
-  // Based on UnderscoreJS implementation:
-  // https://github.com/jashkenas/underscore/blob/master/underscore.js
+  /*
+    Handle compatibility with Node.js, RequireJS as well as without them
+    No bundlers or transpilers
+    Based on UnderscoreJS implementation:
+    https://github.com/jashkenas/underscore/blob/master/underscore.js
+  */
 
   // Establish the root object, `window` (`self`) in the browser, `global`
   // on the server, or `this` in some virtual machines. We use `self`
