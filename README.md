@@ -22,7 +22,8 @@ Or install [npm package](https://www.npmjs.com/package/ecomplus-render):
 [Storefront theme documentation](https://ecomclub.github.io/ecomplus-store-template/).
 
 ## Compiling
-You must have *gulp* instaled globally:
+
+You must have *gulp* installed globally:
 
 ```bash
 npm install -g gulp
