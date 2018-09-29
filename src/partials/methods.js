@@ -10,7 +10,7 @@
     return
   }
   var add = Ecom.addVueMethod
-  if (typeof add === 'function') {
+  if (typeof add !== 'function') {
     // should be a function
     // previous fatal error
     return
