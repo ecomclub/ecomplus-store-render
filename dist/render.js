@@ -43,12 +43,12 @@ var __ecom = {};
       var pack = libs[lib]
 
       // handle require function with compatibility
-      if (typeof require === 'function') {
+      if (root.hasOwnProperty(lib)) {
+        // get from global
+        __ecom[lib] = root[lib]
+      } else if (typeof require === 'function') {
         // require module
         __ecom[lib] = require(pack)
-      } else if (root.hasOwnProperty(pack)) {
-        // get from global
-        __ecom[lib] = root[pack]
       } else {
         console.error(lib + ' (`' + pack + '`) is required and undefined')
         return
@@ -86,6 +86,10 @@ var __ecom = {};
   var root = __ecom.root
   var Ecom = __ecom.Ecom
   var EcomIo = __ecom.EcomIo
+  if (!Ecom || !EcomIo) {
+    // dependencies error
+    return
+  }
   var Vue = __ecom.Vue
 
   // stores list
@@ -576,6 +580,19 @@ var __ecom = {};
 (function () {
   'use strict'
 
+  // global objects
+  var Ecom = __ecom.Ecom
+  if (!Ecom) {
+    // dependencies error
+    return
+  }
+  var add = Ecom.addVueMethod
+  if (typeof add === 'function') {
+    // should be a function
+    // previous fatal error
+    return
+  }
+
   /* auxiliary methods */
 
   var splitImgSize = function (imgBody, index) {
@@ -728,7 +745,7 @@ var __ecom = {};
   // add methods to Ecom Vue mixin
   for (var method in methods) {
     if (methods.hasOwnProperty(method)) {
-      __ecom.Ecom.addVueMethod(method, methods[method])
+      add(method, methods[method])
     }
   }
 }())
