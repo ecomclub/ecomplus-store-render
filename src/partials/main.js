@@ -12,6 +12,9 @@
   // stores list
   var stores = []
 
+  // callback after renderization
+  var todo, done, cb
+
   // Ecom methods for Vue instance
   // set Vue mixin
   var vueEcom = {
@@ -169,6 +172,10 @@
           addToQueue(queue, el, resource, resourceId, listAll, currentId)
         }
 
+        // reset elements counter
+        todo = done = 0
+
+        // start elements queue
         if (getCurrentObj === true) {
           // get resource ID by current URI
           EcomIo.mapByWindowUri(function (err, body) {
@@ -287,6 +294,10 @@
             console.log(get.els)
           }
         }
+
+        // count global todo
+        // more one element
+        todo++
       }
     }
   }
@@ -382,6 +393,8 @@
   var renderElement = function (store, el, body) {
     // pass store properties to instance data
     body.Store = store
+
+    // create new Vue instance
     var vm = new Vue({
       'mixins': [ vueEcom ],
       'el': el,
@@ -394,8 +407,15 @@
         if (typeof el === 'object' && el !== null && el.classList) {
           el.classList.add('rendered')
         }
+
+        // element done
+        done++
+        if (done === todo && typeof cb === 'function') {
+          cb()
+        }
       }
     })
+
     // destroy Vue instace after element rendering
     vm.$destroy()
   }
@@ -451,7 +471,20 @@
     }
 
     // start rendering
-    for (i = 0; i < stores.length; i++) {
+    if (stores.length) {
+      i = 0
+      // set renderization callback
+      cb = function () {
+        i++
+        if (i < stores.length) {
+          render(stores[i])
+        } else if (typeof callback === 'function') {
+          // all done
+          // handle renderization callback param
+          callback()
+        }
+      }
+      // first store
       render(stores[i])
     }
   }
