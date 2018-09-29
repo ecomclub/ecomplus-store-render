@@ -19,7 +19,7 @@ Or install [npm package](https://www.npmjs.com/package/ecomplus-render):
 
 `npm install --save ecomplus-render`
 
-[Storefront theme documentation](https://ecomclub.github.io/ecomplus-store-template/).
+[Storefront theme documentation](https://developers.e-com.plus/docs/themes/).
 
 ## Compiling
 
