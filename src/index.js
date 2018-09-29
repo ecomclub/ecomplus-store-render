@@ -10,14 +10,14 @@ var __ecom = {};
 (function () {
   'use strict'
 
-  /*
-    Handle compatibility with Node.js, RequireJS as well as without them
-    No bundlers or transpilers
-    Based on UnderscoreJS implementation:
-    https://github.com/jashkenas/underscore/blob/master/underscore.js
-  */
+  // Handle compatibility with Node.js, RequireJS as well as without them
+  // No bundlers or transpilers
+  // Based on UnderscoreJS implementation:
+  // https://github.com/jashkenas/underscore/blob/master/underscore.js
 
-  // establish the root object
+  // Establish the root object, `window` (`self`) in the browser, `global`
+  // on the server, or `this` in some virtual machines. We use `self`
+  // instead of `window` for `WebWorker` support.
   /* global self */
   var root = (typeof self === 'object' && self.self === self && self) ||
              (typeof global === 'object' && global.global === global && global) ||
@@ -54,7 +54,11 @@ var __ecom = {};
     }
   }
 
-  // export the Ecom object
+  // Export the Ecom object for **Node.js**, with
+  // backwards-compatibility for their old module API. If we're in
+  // the browser, add `Ecom` as a global object.
+  // (`nodeType` is checked to ensure that `module`
+  // and `exports` are not HTML elements.)
   if (typeof exports !== 'undefined' && !exports.nodeType) {
     // handle exports
     if (typeof module !== 'undefined' && module.exports && !module.nodeType) {
