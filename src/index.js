@@ -43,12 +43,12 @@ var __ecom = {};
       var pack = libs[lib]
 
       // handle require function with compatibility
-      if (typeof require === 'function') {
+      if (root.hasOwnProperty(lib)) {
+        // get from global
+        __ecom[lib] = root[lib]
+      } else if (typeof require === 'function') {
         // require module
         __ecom[lib] = require(pack)
-      } else if (root.hasOwnProperty(pack)) {
-        // get from global
-        __ecom[lib] = root[pack]
       } else {
         console.error(lib + ' (`' + pack + '`) is required and undefined')
         return

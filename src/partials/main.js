@@ -7,6 +7,10 @@
   var root = __ecom.root
   var Ecom = __ecom.Ecom
   var EcomIo = __ecom.EcomIo
+  if (!Ecom || !EcomIo) {
+    // dependencies error
+    return
+  }
   var Vue = __ecom.Vue
 
   // stores list

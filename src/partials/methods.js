@@ -3,6 +3,19 @@
 (function () {
   'use strict'
 
+  // global objects
+  var Ecom = __ecom.Ecom
+  if (!Ecom) {
+    // dependencies error
+    return
+  }
+  var add = Ecom.addVueMethod
+  if (typeof add === 'function') {
+    // should be a function
+    // previous fatal error
+    return
+  }
+
   /* auxiliary methods */
 
   var splitImgSize = function (imgBody, index) {
@@ -155,7 +168,7 @@
   // add methods to Ecom Vue mixin
   for (var method in methods) {
     if (methods.hasOwnProperty(method)) {
-      __ecom.Ecom.addVueMethod(method, methods[method])
+      add(method, methods[method])
     }
   }
 }())
