@@ -62,7 +62,7 @@
 
     price: function (body) {
       // prefer promotional price
-      if (body.hasOwnProperty('price')) {
+      if (!body.hasOwnProperty('base_price') || methods.onPromotion(body)) {
         // sale price
         return body.price
       } else {
@@ -107,7 +107,7 @@
       if (typeof price === 'object') {
         if (price !== null) {
           // suppose to be product object
-          price = price.price
+          price = methods.price(price)
         }
       } else if (typeof price === 'string') {
         price = parseFloat(price)
@@ -142,7 +142,7 @@
         }
       }
 
-      if (body.price && body.base_price) {
+      if (body.hasOwnProperty('price') && body.hasOwnProperty('base_price')) {
         return true
       }
       // default to no promotion
