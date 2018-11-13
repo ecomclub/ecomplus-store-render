@@ -30,7 +30,9 @@ var __ecom = {};
   var Ecom = {}
   __ecom = {
     Ecom: Ecom,
-    root: root
+    root: root,
+    // utility functions
+    _: {}
   }
 
   // load dependencies
@@ -83,6 +85,42 @@ var __ecom = {};
   'use strict'
 
   // global objects
+  var utils = __ecom._
+
+  // get cookie value by cookie name
+  utils.getCookie = function (cname) {
+    // check for document cookies
+    var cookies = root['document'].cookie
+
+    if (typeof cookies === 'string') {
+      // Ref.: https://www.w3schools.com/js/js_cookies.asp
+      var name = cname + '='
+      var decodedCookie = decodeURIComponent(cookies)
+      var ca = decodedCookie.split(';')
+      for (var i = 0; i < ca.length; i++) {
+        var c = ca[i]
+        while (c.charAt(0) === ' ') {
+          c = c.substring(1)
+        }
+        if (c.indexOf(name) === 0) {
+          return c.substring(name.length, c.length)
+        }
+      }
+    }
+
+    // cookie not found
+    // returns null by default
+    return null
+  }
+}())
+;
+
+/* global __ecom */
+
+(function () {
+  'use strict'
+
+  // global objects
   var root = __ecom.root
   var Ecom = __ecom.Ecom
   var EcomIo = __ecom.EcomIo
@@ -91,6 +129,8 @@ var __ecom = {};
     return
   }
   var Vue = __ecom.Vue
+  // utility functions
+  var getCookie = __ecom._.getCookie
 
   // stores list
   var stores = []
@@ -261,14 +301,29 @@ var __ecom = {};
 
         // start elements queue
         if (getCurrentObj === true) {
-          // get resource ID by current URI
-          EcomIo.mapByWindowUri(function (err, body) {
-            if (!err) {
-              runQueue(store, queue, body)
-            } else {
-              console.error(err)
+          var currentObj = {}
+          if (root['location']) {
+            var url = root['location'].pathname
+            if (url) {
+              // try to get resource ID from backend cookies
+              currentObj.resource = getCookie('Ecom.' + url + ':resource')
+              currentObj._id = getCookie('Ecom.' + url + ':_id')
             }
-          })
+          }
+
+          if (!currentObj.resource || !currentObj._id) {
+            // get resource ID by current URI
+            EcomIo.mapByWindowUri(function (err, body) {
+              if (!err) {
+                runQueue(store, queue, body)
+              } else {
+                console.error(err)
+              }
+            })
+          } else {
+            // current object already setted
+            runQueue(store, queue, currentObj)
+          }
         } else {
           // just run the queue
           runQueue(store, queue)
@@ -278,14 +333,16 @@ var __ecom = {};
       }
     }
 
-    // initialize storefront SDK
-    if (store.hasOwnProperty('store_id') && store.hasOwnProperty('store_object_id')) {
-      // console.log('Init storefront SDK for #' + store.store_id)
-      EcomIo.init(callback, store.store_id, store.store_object_id)
-    } else {
-      // set store in function of site domain name
-      EcomIo.init(callback)
+    // is store IDs undefineds, try to get from backend cookies
+    // https://github.com/ecomclub/dynamic-backend
+    if (!store.hasOwnProperty('store_id')) {
+      store.store_id = getCookie('Ecom.store_id')
     }
+    if (!store.hasOwnProperty('store_object_id')) {
+      store.store_object_id = getCookie('Ecom.store_object_id')
+    }
+    // initialize storefront SDK
+    EcomIo.init(callback, store.store_id, store.store_object_id)
   }
 
   var addToQueue = function (queue, el, resource, resourceId, listAll, currentId) {
