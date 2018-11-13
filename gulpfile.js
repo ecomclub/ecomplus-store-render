@@ -38,6 +38,7 @@ gulp.task('concat', function () {
   // concat index and partials
   return gulp.src([
     './src/index.js',
+    './src/partials/_.js',
     './src/partials/main.js',
     './src/partials/methods.js'
   ])
