@@ -12,6 +12,8 @@
     return
   }
   var Vue = __ecom.Vue
+  // utility functions
+  var getCookie = __ecom._.getCookie
 
   // stores list
   var stores = []
@@ -199,14 +201,16 @@
       }
     }
 
-    // initialize storefront SDK
-    if (store.hasOwnProperty('store_id') && store.hasOwnProperty('store_object_id')) {
-      // console.log('Init storefront SDK for #' + store.store_id)
-      EcomIo.init(callback, store.store_id, store.store_object_id)
-    } else {
-      // set store in function of site domain name
-      EcomIo.init(callback)
+    // is store IDs undefineds, try to get from backend cookies
+    // https://github.com/ecomclub/dynamic-backend
+    if (!store.hasOwnProperty('store_id')) {
+      store.store_id = getCookie('Ecom.store_id')
     }
+    if (!store.hasOwnProperty('store_object_id')) {
+      store.store_object_id = getCookie('Ecom.store_object_id')
+    }
+    // initialize storefront SDK
+    EcomIo.init(callback, store.store_id, store.store_object_id)
   }
 
   var addToQueue = function (queue, el, resource, resourceId, listAll, currentId) {

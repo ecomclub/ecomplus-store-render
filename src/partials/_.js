@@ -28,7 +28,7 @@
     }
 
     // cookie not found
-    // returns empty string by default
-    return ''
+    // returns null by default
+    return null
   }
 }())
