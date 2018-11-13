@@ -184,14 +184,29 @@
 
         // start elements queue
         if (getCurrentObj === true) {
-          // get resource ID by current URI
-          EcomIo.mapByWindowUri(function (err, body) {
-            if (!err) {
-              runQueue(store, queue, body)
-            } else {
-              console.error(err)
+          var currentObj = {}
+          if (root['location']) {
+            var url = root['location'].pathname
+            if (url) {
+              // try to get resource ID from backend cookies
+              currentObj.resource = getCookie('Ecom.' + url + ':resource')
+              currentObj._id = getCookie('Ecom.' + url + ':_id')
             }
-          })
+          }
+
+          if (!currentObj.resource || !currentObj._id) {
+            // get resource ID by current URI
+            EcomIo.mapByWindowUri(function (err, body) {
+              if (!err) {
+                runQueue(store, queue, body)
+              } else {
+                console.error(err)
+              }
+            })
+          } else {
+            // current object already setted
+            runQueue(store, queue, currentObj)
+          }
         } else {
           // just run the queue
           runQueue(store, queue)
