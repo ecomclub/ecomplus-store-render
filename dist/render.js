@@ -338,8 +338,13 @@ var __ecom = {};
     if (!store.hasOwnProperty('store_id')) {
       store.store_id = getCookie('Ecom.store_id')
     }
-    if (!store.hasOwnProperty('store_object_id')) {
-      store.store_object_id = getCookie('Ecom.store_object_id')
+    if (store.store_id) {
+      if (!store.hasOwnProperty('store_object_id')) {
+        store.store_object_id = getCookie('Ecom.store_object_id')
+      }
+      if (!store.lang) {
+        store.lang = getCookie('Ecom.default_lang')
+      }
     }
     // initialize storefront SDK
     EcomIo.init(callback, store.store_id, store.store_object_id)
