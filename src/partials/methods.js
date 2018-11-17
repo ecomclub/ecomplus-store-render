@@ -70,16 +70,14 @@
       }
     },
 
+    minQuantity: function (body) {
+      return body.min_quantity || 1
+    },
+
     inStock: function (body) {
       // check inventory
       if (body.hasOwnProperty('quantity')) {
-        var min
-        if (body.hasOwnProperty('min_quantity')) {
-          min = body.min_quantity
-        } else {
-          min = 1
-        }
-        if (body.quantity >= min) {
+        if (body.quantity >= methods.minQuantity(body)) {
           // in stock
           return true
         }
@@ -162,6 +160,60 @@
         return methods.alphabeticalSort(list.results)
       }
       return list
+    },
+
+    findByProperty: function (list, prop, value) {
+      // must be an array
+      if (Array.isArray(list)) {
+        for (var i = 0; i < list.length; i++) {
+          var obj = list[i]
+          if (obj && obj[prop] === value) {
+            // object found
+            return obj
+          }
+        }
+      }
+      return undefined
+    },
+
+    findBySlug: function (list, slug) {
+      // must be an array
+      if (Array.isArray(list)) {
+        return methods.findProperty(list, 'slug', slug)
+      }
+      return undefined
+    },
+
+    specTextValue: function (body, spec, delimiter) {
+      var specValues = []
+      if (Array.isArray(body)) {
+        // spec values list sent as body param
+        specValues = body
+      } else {
+        var specifications = body.specifications
+        if (specifications) {
+          for (var grid in specifications) {
+            if (specifications.hasOwnProperty(grid) && grid === spec) {
+              // specification found
+              specValues = specifications[grid]
+            }
+          }
+        }
+      }
+
+      if (specValues.length) {
+        var valuesString = specValues[0].text
+        if (!delimiter) {
+          // comma as default text delimiter
+          delimiter = ', '
+        }
+        for (var i = 1; i < specValues.length; i++) {
+          valuesString += delimiter + specValues[i].text
+        }
+        return valuesString
+      }
+      // specification not found
+      return null
     }
   }
 
