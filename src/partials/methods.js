@@ -217,6 +217,7 @@
     },
 
     splitCategoryTree: function (body) {
+      // parse category tree string to array
       var categories = []
       var categoryTree
       if (typeof body === 'string') {
@@ -235,6 +236,53 @@
       }
       // return array of categories
       return categories
+    },
+
+    variationsGrids: function (body, filterGrids, delimiter) {
+      // parse variations specifications to one object only
+      var grids = {}
+      if (body.hasOwnProperty('variations')) {
+        for (var i = 0; i < body.variations.length; i++) {
+          var variation = body.variations[i]
+          var specifications = variation.specifications
+          // abstraction to get spec text value
+          var specValue = function (grid) {
+            return methods.specTextValue(variation, grid, delimiter)
+          }
+
+          if (specifications) {
+            // check if current variation specs match with filters
+            if (filterGrids) {
+              var skip = false
+              for (var filter in filterGrids) {
+                if (filterGrids.hasOwnProperty(filter)) {
+                  if (!specifications[filter] || specValue(filter) !== filterGrids[filter]) {
+                    // does not match filtered grid
+                    // skip current variation
+                    skip = true
+                    break
+                  }
+                }
+              }
+              if (skip) {
+                continue
+              }
+            }
+
+            // get values from each variation spec
+            for (var grid in specifications) {
+              if (specifications.hasOwnProperty(grid)) {
+                if (!grids.hasOwnProperty(grid)) {
+                  grids[grid] = []
+                }
+                grids[grid].push(specValue(grid))
+              }
+            }
+          }
+        }
+      }
+      // returns parsed grid object
+      return grid
     }
   }
 
