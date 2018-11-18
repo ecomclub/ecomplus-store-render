@@ -214,6 +214,27 @@
       }
       // specification not found
       return null
+    },
+
+    splitCategoryTree: function (body) {
+      var categories = []
+      var categoryTree
+      if (typeof body === 'string') {
+        // category tree string already sent as body param
+        categoryTree = body
+      } else {
+        categoryTree = body.category_tree
+      }
+
+      if (categoryTree) {
+        categories = categoryTree.split('>')
+        for (var i = 0; i < categories.length; i++) {
+          // remove white spaces from names
+          categories[i] = categories[i].trim()
+        }
+      }
+      // return array of categories
+      return categories
     }
   }
 
