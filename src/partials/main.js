@@ -123,8 +123,12 @@
 
         for (i = 0; i < els.length; i++) {
           el = els[i]
+          var graphsApi = false
           var skip = false
-          switch (el.dataset.type) {
+          var type = el.dataset.type
+
+          // handle resource by element type
+          switch (type) {
             case 'product':
             case 'brand':
             case 'collection':
@@ -134,11 +138,19 @@
             case 'application':
             case 'store':
               // eg.: products
-              resource = el.dataset.type + 's'
+              resource = type + 's'
               break
 
             case 'category':
-              resource = el.dataset.type.slice(0, -1) + 'ies'
+              resource = type.slice(0, -1) + 'ies'
+              break
+
+            case 'related':
+            case 'recommended':
+              // Graphs API
+              graphsApi = true
+              // also added to queue
+              resource = type
               break
 
             case 'items':
@@ -164,7 +176,7 @@
             if (resource === 'stores') {
               // get current store info
               resourceId = store.store_object_id
-            } else if (el.dataset.hasOwnProperty('listAll')) {
+            } else if (el.dataset.hasOwnProperty('listAll') && !graphsApi) {
               // list all objects
               listAll = true
             } else {
@@ -176,7 +188,8 @@
             }
           }
 
-          addToQueue(queue, el, resource, resourceId, listAll, currentId)
+          // schedule API request to element renderization
+          addToQueue(queue, el, resource, resourceId, listAll, currentId, graphsApi)
         }
 
         // reset elements counter
@@ -233,7 +246,7 @@
     EcomIo.init(callback, store.store_id, store.store_object_id)
   }
 
-  var addToQueue = function (queue, el, resource, resourceId, listAll, currentId) {
+  var addToQueue = function (queue, el, resource, resourceId, listAll, currentId, graphsApi) {
     var index
     if (!listAll && !currentId) {
       index = resourceId
@@ -241,6 +254,10 @@
       // list all resource objects or use object of current URI
       // no resource ID
       index = resource
+    }
+    if (graphsApi) {
+      // request related or recommended products from Graphs API
+      index = resource + '/' + index
     }
 
     if (queue.hasOwnProperty(index)) {
@@ -254,18 +271,24 @@
       // set on queue
       queue[index] = {
         'resource': resource,
+        'id': resourceId,
         'list': listAll,
         'current': currentId,
-        'els': [ el ]
+        'els': [ el ],
+        'graphs': graphsApi
       }
     }
   }
 
   var runQueue = function (store, queue, currentObj) {
-    for (var resourceId in queue) {
-      if (queue.hasOwnProperty(resourceId)) {
-        var get = queue[resourceId]
+    var ioMethod
+    for (var index in queue) {
+      if (queue.hasOwnProperty(index)) {
+        var get = queue[index]
+        // request options
         var resource = get.resource
+        var resourceId = get.id
+        var graphsApi = get.graphs
 
         var callback = (function () {
           // scoped
@@ -301,25 +324,43 @@
           }
         }())
 
-        if (!get.list) {
-          if (!get.current) {
-            // resource ID defined by element data
-            EcomIo.getById(callback, resource, resourceId)
-          } else if (resource === currentObj.resource) {
-            // current URI resource object
-            EcomIo.getById(callback, resource, currentObj._id)
+        if (!graphsApi) {
+          // default to Store API
+          if (!get.list) {
+            if (!get.current) {
+              // resource ID defined by element data
+              EcomIo.getById(callback, resource, resourceId)
+            } else if (resource === currentObj.resource) {
+              // current URI resource object
+              EcomIo.getById(callback, resource, currentObj._id)
+            } else {
+              console.log('Ignored elements, id undefined and type does not match with URI resource:')
+              console.log(get.els)
+            }
           } else {
-            console.log('Ignored elements, id undefined and type does not match with URI resource:')
-            console.log(get.els)
+            // list all resource objects
+            // no resource ID
+            ioMethod = 'list' + resource.charAt(0).toUpperCase() + resource.slice(1)
+
+            if (EcomIo.hasOwnProperty(ioMethod)) {
+              EcomIo[ioMethod](callback)
+            } else {
+              console.log('Ignored elements, list all unavailable for this resource:')
+              console.log(get.els)
+            }
           }
         } else {
-          // list all resource objects
-          // no resource ID
-          var ioMethod = 'list' + resource.charAt(0).toUpperCase() + resource.slice(1)
-          if (EcomIo.hasOwnProperty(ioMethod)) {
-            EcomIo[ioMethod](callback)
+          // handle requests to Graphs API
+          ioMethod = resource === 'related' ? 'getRelatedProducts' : 'getRecommendedProducts'
+
+          if (!get.current) {
+            // product ID defined by element data
+            EcomIo[ioMethod](callback, resourceId)
+          } else if (currentObj.resource === 'products') {
+            // current URI product object
+            EcomIo.getById(callback, currentObj._id)
           } else {
-            console.log('Ignored elements, list all unavailable for this resource:')
+            console.log('Ignored elements, product id undefined for Graphs method:')
             console.log(get.els)
           }
         }
