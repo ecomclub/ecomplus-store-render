@@ -337,7 +337,6 @@ var __ecom = {};
             // get resource ID by current URI
             EcomIo.mapByWindowUri(function (err, body) {
               if (!err) {
-                console.log(body)
                 runQueue(store, queue, body)
               } else {
                 console.error(err)
@@ -381,6 +380,9 @@ var __ecom = {};
       // list all resource objects or use object of current URI
       // no resource ID
       index = resource
+      if (currentId) {
+        index += '&'
+      }
     }
     if (graphsApi) {
       // request related or recommended products from Graphs API
@@ -414,7 +416,6 @@ var __ecom = {};
         (function () {
           // scoped
           var get = queue[index]
-          console.log(get)
           // request options
           var resource = get.resource
           var resourceId = get.id
@@ -459,7 +460,6 @@ var __ecom = {};
                   searchItems(store, el, body)
                 } else {
                   // simple Store API object
-                  console.log(store, el, body)
                   renderElement(store, el, body)
                 }
               }
@@ -478,7 +478,6 @@ var __ecom = {};
                 EcomIo.getById(callback, resource, resourceId)
               } else if (resource === currentObj.resource) {
                 // current URI resource object
-                console.log('current')
                 EcomIo.getById(callback, resource, currentObj._id)
               } else {
                 console.log('Ignored elements, id undefined and type does not match with URI resource:')
