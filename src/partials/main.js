@@ -298,20 +298,35 @@
               for (var i = 0; i < els.length; i++) {
                 var el = els[i]
 
-                if (el.dataset.hasOwnProperty('list')) {
+                if (graphsApi || el.dataset.hasOwnProperty('list')) {
                   // search items by IDs from resource field
                   var field = el.dataset.list
-                  if (body.hasOwnProperty(field)) {
-                    var ids = body[field]
-                    // set data-ids
-                    if (Array.isArray(ids)) {
-                      // implode array with separator ,
-                      el.dataset.ids = ids.join()
-                    } else if (typeof ids === 'string') {
-                      // expect that the string already is a valid product object ID
-                      el.dataset.ids = ids
+                  var ids
+                  if (graphsApi) {
+                    // parse Graphs API response to array
+                    // https://developers.e-com.plus/docs/api/#/graphs/
+                    if (Array.isArray(body.results) && body.results.length) {
+                      var data = body.results[0].data
+                      if (data) {
+                        for (var ii = 0; ii < data.length; ii++) {
+                          ids.push(data[ii].row)
+                        }
+                      }
                     }
+                  } else if (body.hasOwnProperty(field)) {
+                    ids = body[field]
                   }
+
+                  // set data-ids
+                  if (Array.isArray(ids)) {
+                    // implode array with separator ,
+                    el.dataset.ids = ids.join()
+                  } else if (typeof ids === 'string') {
+                    // expect that the string already is a valid product object ID
+                    el.dataset.ids = ids
+                  }
+
+                  // send request to Search API
                   searchItems(store, el, body)
                 } else {
                   // simple Store API object
@@ -358,7 +373,7 @@
             EcomIo[ioMethod](callback, resourceId)
           } else if (currentObj.resource === 'products') {
             // current URI product object
-            EcomIo.getById(callback, currentObj._id)
+            EcomIo[ioMethod](callback, currentObj._id)
           } else {
             console.log('Ignored elements, product id undefined for Graphs method:')
             console.log(get.els)
