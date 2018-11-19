@@ -488,9 +488,14 @@
     }, arg.term, arg.from, arg.size, arg.sort, arg.specs, arg.ids, arg.brands, arg.categories, arg.prices)
   }
 
-  var renderElement = function (store, el, body) {
+  var renderElement = function (store, el, body, callback) {
     // pass store properties to instance data
-    body.Store = store
+    if (store) {
+      body.Store = store
+    } else if (stores.length) {
+      // use first recognized store
+      body.Store = stores[0]
+    }
 
     // create new Vue instance
     var vm = new Vue({
@@ -505,8 +510,13 @@
         if (typeof el === 'object' && el !== null && el.classList) {
           el.classList.add('rendered')
         }
+
         // element done
         checkAllDone()
+        if (typeof callback === 'function') {
+          // handle custom callback for this current element only
+          callback()
+        }
       }
     })
 
@@ -518,6 +528,9 @@
   Ecom.stores = function () {
     return stores
   }
+
+  // option to render specific elements manually
+  Ecom.render = renderElement
 
   Ecom.init = function (callback, storeId, storeObjectId, lang, doc) {
     var i, store
