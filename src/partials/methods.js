@@ -184,6 +184,22 @@
       return undefined
     },
 
+    filterByParentSlug: function (categories, slug) {
+      // for categories
+      // filter by parent category slug
+      var matchedCategories = []
+      if (Array.isArray(categories)) {
+        for (var i = 0; i < categories.length; i++) {
+          var category = categories[i]
+          if (category.parent && category.parent.slug === slug) {
+            matchedCategories.push(category)
+          }
+        }
+      }
+      // returns array of macthed category objects
+      return matchedCategories
+    },
+
     specTextValue: function (body, spec, delimiter) {
       var specValues = []
       if (Array.isArray(body)) {
