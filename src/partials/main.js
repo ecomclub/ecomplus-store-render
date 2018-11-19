@@ -305,6 +305,7 @@
                   if (graphsApi) {
                     // parse Graphs API response to array
                     // https://developers.e-com.plus/docs/api/#/graphs/
+                    ids = []
                     if (Array.isArray(body.results) && body.results.length) {
                       var data = body.results[0].data
                       if (data) {
