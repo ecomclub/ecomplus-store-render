@@ -20,6 +20,13 @@
 
   // callback after renderization
   var todo, done, cb
+  var checkAllDone = function () {
+    // element finished
+    done++
+    if (done === todo && typeof cb === 'function') {
+      cb()
+    }
+  }
 
   // Ecom methods for Vue instance
   // set Vue mixin
@@ -336,6 +343,8 @@
               }
             } else {
               console.error(err)
+              // proceed to callback even with error
+              checkAllDone()
             }
           }
 
@@ -379,11 +388,11 @@
               console.log(get.els)
             }
           }
-        }())
 
-        // count global todo
-        // more one element
-        todo++
+          // count global todo
+          // more elements
+          todo += els.length
+        }())
       }
     }
   }
@@ -472,6 +481,8 @@
         renderElement(store, el, body)
       } else {
         console.error(err)
+        // proceed to callback even with error
+        checkAllDone()
       }
     }, arg.term, arg.from, arg.size, arg.sort, arg.specs, arg.ids, arg.brands, arg.categories, arg.prices)
   }
@@ -493,12 +504,8 @@
         if (typeof el === 'object' && el !== null && el.classList) {
           el.classList.add('rendered')
         }
-
         // element done
-        done++
-        if (done === todo && typeof cb === 'function') {
-          cb()
-        }
+        checkAllDone()
       }
     })
 
