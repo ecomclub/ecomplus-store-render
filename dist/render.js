@@ -649,6 +649,8 @@ var __ecom = {};
 
   // option to render specific elements manually
   Ecom.render = renderElement
+  // export Vue instance available methods
+  Ecom.methods = vueEcom.methods
 
   Ecom.init = function (callback, storeId, storeObjectId, lang, doc) {
     var i, store
