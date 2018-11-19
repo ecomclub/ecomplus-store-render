@@ -284,16 +284,16 @@
     var ioMethod
     for (var index in queue) {
       if (queue.hasOwnProperty(index)) {
-        var get = queue[index]
-        // request options
-        var resource = get.resource
-        var resourceId = get.id
-        var graphsApi = get.graphs
-
-        var callback = (function () {
+        (function () {
           // scoped
+          var get = queue[index]
+          // request options
+          var resource = get.resource
+          var resourceId = get.id
+          var graphsApi = get.graphs
           var els = get.els
-          return function (err, body) {
+
+          var callback = function (err, body) {
             if (!err) {
               for (var i = 0; i < els.length; i++) {
                 var el = els[i]
@@ -338,48 +338,48 @@
               console.error(err)
             }
           }
-        }())
 
-        if (!graphsApi) {
-          // default to Store API
-          if (!get.list) {
+          if (!graphsApi) {
+            // default to Store API
+            if (!get.list) {
+              if (!get.current) {
+                // resource ID defined by element data
+                EcomIo.getById(callback, resource, resourceId)
+              } else if (resource === currentObj.resource) {
+                // current URI resource object
+                EcomIo.getById(callback, resource, currentObj._id)
+              } else {
+                console.log('Ignored elements, id undefined and type does not match with URI resource:')
+                console.log(get.els)
+              }
+            } else {
+              // list all resource objects
+              // no resource ID
+              ioMethod = 'list' + resource.charAt(0).toUpperCase() + resource.slice(1)
+
+              if (EcomIo.hasOwnProperty(ioMethod)) {
+                EcomIo[ioMethod](callback)
+              } else {
+                console.log('Ignored elements, list all unavailable for this resource:')
+                console.log(get.els)
+              }
+            }
+          } else {
+            // handle requests to Graphs API
+            ioMethod = resource === 'related' ? 'listRelatedProducts' : 'listRecommendedProducts'
+
             if (!get.current) {
-              // resource ID defined by element data
-              EcomIo.getById(callback, resource, resourceId)
-            } else if (resource === currentObj.resource) {
-              // current URI resource object
-              EcomIo.getById(callback, resource, currentObj._id)
+              // product ID defined by element data
+              EcomIo[ioMethod](callback, resourceId)
+            } else if (currentObj.resource === 'products') {
+              // current URI product object
+              EcomIo[ioMethod](callback, currentObj._id)
             } else {
-              console.log('Ignored elements, id undefined and type does not match with URI resource:')
-              console.log(get.els)
-            }
-          } else {
-            // list all resource objects
-            // no resource ID
-            ioMethod = 'list' + resource.charAt(0).toUpperCase() + resource.slice(1)
-
-            if (EcomIo.hasOwnProperty(ioMethod)) {
-              EcomIo[ioMethod](callback)
-            } else {
-              console.log('Ignored elements, list all unavailable for this resource:')
+              console.log('Ignored elements, product id undefined for Graphs method:')
               console.log(get.els)
             }
           }
-        } else {
-          // handle requests to Graphs API
-          ioMethod = resource === 'related' ? 'listRelatedProducts' : 'listRecommendedProducts'
-
-          if (!get.current) {
-            // product ID defined by element data
-            EcomIo[ioMethod](callback, resourceId)
-          } else if (currentObj.resource === 'products') {
-            // current URI product object
-            EcomIo[ioMethod](callback, currentObj._id)
-          } else {
-            console.log('Ignored elements, product id undefined for Graphs method:')
-            console.log(get.els)
-          }
-        }
+        }())
 
         // count global todo
         // more one element
