@@ -484,7 +484,7 @@ var __ecom = {};
           }
         } else {
           // handle requests to Graphs API
-          ioMethod = resource === 'related' ? 'getRelatedProducts' : 'getRecommendedProducts'
+          ioMethod = resource === 'related' ? 'listRelatedProducts' : 'listRecommendedProducts'
 
           if (!get.current) {
             // product ID defined by element data
