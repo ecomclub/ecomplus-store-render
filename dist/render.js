@@ -994,7 +994,7 @@ var __ecom = {};
         }
       }
       // returns parsed grid object
-      return grid
+      return grids
     }
   }
 
