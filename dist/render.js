@@ -240,8 +240,12 @@ var __ecom = {};
 
         for (i = 0; i < els.length; i++) {
           el = els[i]
+          var graphsApi = false
           var skip = false
-          switch (el.dataset.type) {
+          var type = el.dataset.type
+
+          // handle resource by element type
+          switch (type) {
             case 'product':
             case 'brand':
             case 'collection':
@@ -251,11 +255,19 @@ var __ecom = {};
             case 'application':
             case 'store':
               // eg.: products
-              resource = el.dataset.type + 's'
+              resource = type + 's'
               break
 
             case 'category':
-              resource = el.dataset.type.slice(0, -1) + 'ies'
+              resource = type.slice(0, -1) + 'ies'
+              break
+
+            case 'related':
+            case 'recommended':
+              // Graphs API
+              graphsApi = true
+              // also added to queue
+              resource = type
               break
 
             case 'items':
@@ -281,7 +293,7 @@ var __ecom = {};
             if (resource === 'stores') {
               // get current store info
               resourceId = store.store_object_id
-            } else if (el.dataset.hasOwnProperty('listAll')) {
+            } else if (el.dataset.hasOwnProperty('listAll') && !graphsApi) {
               // list all objects
               listAll = true
             } else {
@@ -293,7 +305,8 @@ var __ecom = {};
             }
           }
 
-          addToQueue(queue, el, resource, resourceId, listAll, currentId)
+          // schedule API request to element renderization
+          addToQueue(queue, el, resource, resourceId, listAll, currentId, graphsApi)
         }
 
         // reset elements counter
@@ -350,7 +363,7 @@ var __ecom = {};
     EcomIo.init(callback, store.store_id, store.store_object_id)
   }
 
-  var addToQueue = function (queue, el, resource, resourceId, listAll, currentId) {
+  var addToQueue = function (queue, el, resource, resourceId, listAll, currentId, graphsApi) {
     var index
     if (!listAll && !currentId) {
       index = resourceId
@@ -358,6 +371,10 @@ var __ecom = {};
       // list all resource objects or use object of current URI
       // no resource ID
       index = resource
+    }
+    if (graphsApi) {
+      // request related or recommended products from Graphs API
+      index = resource + '/' + index
     }
 
     if (queue.hasOwnProperty(index)) {
@@ -371,18 +388,24 @@ var __ecom = {};
       // set on queue
       queue[index] = {
         'resource': resource,
+        'id': resourceId,
         'list': listAll,
         'current': currentId,
-        'els': [ el ]
+        'els': [ el ],
+        'graphs': graphsApi
       }
     }
   }
 
   var runQueue = function (store, queue, currentObj) {
-    for (var resourceId in queue) {
-      if (queue.hasOwnProperty(resourceId)) {
-        var get = queue[resourceId]
+    var ioMethod
+    for (var index in queue) {
+      if (queue.hasOwnProperty(index)) {
+        var get = queue[index]
+        // request options
         var resource = get.resource
+        var resourceId = get.id
+        var graphsApi = get.graphs
 
         var callback = (function () {
           // scoped
@@ -392,20 +415,35 @@ var __ecom = {};
               for (var i = 0; i < els.length; i++) {
                 var el = els[i]
 
-                if (el.dataset.hasOwnProperty('list')) {
+                if (graphsApi || el.dataset.hasOwnProperty('list')) {
                   // search items by IDs from resource field
                   var field = el.dataset.list
-                  if (body.hasOwnProperty(field)) {
-                    var ids = body[field]
-                    // set data-ids
-                    if (Array.isArray(ids)) {
-                      // implode array with separator ,
-                      el.dataset.ids = ids.join()
-                    } else if (typeof ids === 'string') {
-                      // expect that the string already is a valid product object ID
-                      el.dataset.ids = ids
+                  var ids
+                  if (graphsApi) {
+                    // parse Graphs API response to array
+                    // https://developers.e-com.plus/docs/api/#/graphs/
+                    if (Array.isArray(body.results) && body.results.length) {
+                      var data = body.results[0].data
+                      if (data) {
+                        for (var ii = 0; ii < data.length; ii++) {
+                          ids.push(data[ii].row)
+                        }
+                      }
                     }
+                  } else if (body.hasOwnProperty(field)) {
+                    ids = body[field]
                   }
+
+                  // set data-ids
+                  if (Array.isArray(ids)) {
+                    // implode array with separator ,
+                    el.dataset.ids = ids.join()
+                  } else if (typeof ids === 'string') {
+                    // expect that the string already is a valid product object ID
+                    el.dataset.ids = ids
+                  }
+
+                  // send request to Search API
                   searchItems(store, el, body)
                 } else {
                   // simple Store API object
@@ -418,25 +456,43 @@ var __ecom = {};
           }
         }())
 
-        if (!get.list) {
-          if (!get.current) {
-            // resource ID defined by element data
-            EcomIo.getById(callback, resource, resourceId)
-          } else if (resource === currentObj.resource) {
-            // current URI resource object
-            EcomIo.getById(callback, resource, currentObj._id)
+        if (!graphsApi) {
+          // default to Store API
+          if (!get.list) {
+            if (!get.current) {
+              // resource ID defined by element data
+              EcomIo.getById(callback, resource, resourceId)
+            } else if (resource === currentObj.resource) {
+              // current URI resource object
+              EcomIo.getById(callback, resource, currentObj._id)
+            } else {
+              console.log('Ignored elements, id undefined and type does not match with URI resource:')
+              console.log(get.els)
+            }
           } else {
-            console.log('Ignored elements, id undefined and type does not match with URI resource:')
-            console.log(get.els)
+            // list all resource objects
+            // no resource ID
+            ioMethod = 'list' + resource.charAt(0).toUpperCase() + resource.slice(1)
+
+            if (EcomIo.hasOwnProperty(ioMethod)) {
+              EcomIo[ioMethod](callback)
+            } else {
+              console.log('Ignored elements, list all unavailable for this resource:')
+              console.log(get.els)
+            }
           }
         } else {
-          // list all resource objects
-          // no resource ID
-          var ioMethod = 'list' + resource.charAt(0).toUpperCase() + resource.slice(1)
-          if (EcomIo.hasOwnProperty(ioMethod)) {
-            EcomIo[ioMethod](callback)
+          // handle requests to Graphs API
+          ioMethod = resource === 'related' ? 'getRelatedProducts' : 'getRecommendedProducts'
+
+          if (!get.current) {
+            // product ID defined by element data
+            EcomIo[ioMethod](callback, resourceId)
+          } else if (currentObj.resource === 'products') {
+            // current URI product object
+            EcomIo[ioMethod](callback, currentObj._id)
           } else {
-            console.log('Ignored elements, list all unavailable for this resource:')
+            console.log('Ignored elements, product id undefined for Graphs method:')
             console.log(get.els)
           }
         }
@@ -823,6 +879,22 @@ var __ecom = {};
       return undefined
     },
 
+    filterByParentSlug: function (categories, slug) {
+      // for categories
+      // filter by parent category slug
+      var matchedCategories = []
+      if (Array.isArray(categories)) {
+        for (var i = 0; i < categories.length; i++) {
+          var category = categories[i]
+          if (category.parent && category.parent.slug === slug) {
+            matchedCategories.push(category)
+          }
+        }
+      }
+      // returns array of macthed category objects
+      return matchedCategories
+    },
+
     specTextValue: function (body, spec, delimiter) {
       var specValues = []
       if (Array.isArray(body)) {
@@ -853,6 +925,75 @@ var __ecom = {};
       }
       // specification not found
       return null
+    },
+
+    splitCategoryTree: function (body) {
+      // parse category tree string to array
+      var categories = []
+      var categoryTree
+      if (typeof body === 'string') {
+        // category tree string already sent as body param
+        categoryTree = body
+      } else {
+        categoryTree = body.category_tree
+      }
+
+      if (categoryTree) {
+        categories = categoryTree.split('>')
+        for (var i = 0; i < categories.length; i++) {
+          // remove white spaces from names
+          categories[i] = categories[i].trim()
+        }
+      }
+      // return array of categories
+      return categories
+    },
+
+    variationsGrids: function (body, filterGrids, delimiter) {
+      // parse variations specifications to one object only
+      var grids = {}
+      if (body.hasOwnProperty('variations')) {
+        for (var i = 0; i < body.variations.length; i++) {
+          var variation = body.variations[i]
+          var specifications = variation.specifications
+          // abstraction to get spec text value
+          var specValue = function (grid) {
+            return methods.specTextValue(variation, grid, delimiter)
+          }
+
+          if (specifications) {
+            // check if current variation specs match with filters
+            if (filterGrids) {
+              var skip = false
+              for (var filter in filterGrids) {
+                if (filterGrids.hasOwnProperty(filter)) {
+                  if (!specifications[filter] || specValue(filter) !== filterGrids[filter]) {
+                    // does not match filtered grid
+                    // skip current variation
+                    skip = true
+                    break
+                  }
+                }
+              }
+              if (skip) {
+                continue
+              }
+            }
+
+            // get values from each variation spec
+            for (var grid in specifications) {
+              if (specifications.hasOwnProperty(grid)) {
+                if (!grids.hasOwnProperty(grid)) {
+                  grids[grid] = []
+                }
+                grids[grid].push(specValue(grid))
+              }
+            }
+          }
+        }
+      }
+      // returns parsed grid object
+      return grid
     }
   }
 
