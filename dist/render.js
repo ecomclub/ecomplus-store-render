@@ -241,6 +241,8 @@ var __ecom = {};
         // render elements
         // https://developers.e-com.plus/ecomplus-store-template/#vue-instances
         var els = findChildsByClass(doc, '_ecom-el')
+        // reset elements counter
+        todo = done = 0
 
         // resources queue
         var queue = {}
@@ -281,6 +283,8 @@ var __ecom = {};
             case 'items':
               // Search API
               searchItems(store, el)
+              // count more one todo
+              todo++
               skip = true
               break
 
@@ -316,9 +320,6 @@ var __ecom = {};
           // schedule API request to element renderization
           addToQueue(queue, el, resource, resourceId, listAll, currentId, graphsApi)
         }
-
-        // reset elements counter
-        todo = done = 0
 
         // start elements queue
         if (getCurrentObj === true) {
