@@ -4,6 +4,7 @@
   'use strict'
 
   // global objects
+  var root = __ecom.root
   var utils = __ecom._
 
   // get cookie value by cookie name
