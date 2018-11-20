@@ -208,10 +208,10 @@
           var currentObj = {}
           if (root['location']) {
             var url = root['location'].pathname
-            if (url) {
+            if (url && url === getCookie('Ecom.current.path')) {
               // try to get resource ID from backend cookies
-              currentObj.resource = getCookie('Ecom.' + url + ':resource')
-              currentObj._id = getCookie('Ecom.' + url + ':_id')
+              currentObj.resource = getCookie('Ecom.current.resource')
+              currentObj._id = getCookie('Ecom.current._id')
             }
           }
 

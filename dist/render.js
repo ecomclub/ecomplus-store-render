@@ -618,13 +618,25 @@ var __ecom = {};
       body.Store = stores[0]
     }
 
+    // handle element data
+    var data = {
+      'body': body
+    }
+    // get custom variables from data-payload
+    if (el.dataset.hasOwnProperty('payload')) {
+      try {
+        data.payload = JSON.parse(el.dataset.payload)
+      } catch (e) {
+        console.log('Ignoring invalid element payload:')
+        console.log(el)
+      }
+    }
+
     // create new Vue instance
     var vm = new Vue({
       'mixins': [ vueEcom ],
       'el': el,
-      'data': {
-        'body': body
-      },
+      'data': data,
       'destroyed': function () {
         // mark element as rendered
         var el = this.$el
