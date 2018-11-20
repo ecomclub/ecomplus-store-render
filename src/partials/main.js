@@ -505,7 +505,7 @@
       'body': body
     }
     // get custom variables from data-payload
-    if (el.dataset.payload) {
+    if (el.dataset.hasOwnProperty('payload')) {
       try {
         data.payload = JSON.parse(el.dataset.payload)
       } catch (e) {
