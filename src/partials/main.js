@@ -345,6 +345,11 @@
                   renderElement(store, el, body)
                 }
               }
+
+              if (get.current) {
+                // share current object globally
+                Ecom.currentObject = body
+              }
             } else {
               console.error(err)
               // proceed to callback even with error
