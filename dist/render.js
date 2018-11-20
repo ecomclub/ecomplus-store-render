@@ -636,6 +636,10 @@ var __ecom = {};
         console.log(el)
       }
     }
+    if (!Ecom.hasOwnProperty('currentObject') && el.dataset.current === 'true') {
+      // force as current object
+      Ecom.currentObject = body
+    }
 
     // create new Vue instance
     var vm = new Vue({
