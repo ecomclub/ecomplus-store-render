@@ -464,7 +464,7 @@ var __ecom = {};
                 }
               }
 
-              if (get.current) {
+              if (get.current && body._id) {
                 // share current object globally
                 Ecom.currentObject = body
               }
