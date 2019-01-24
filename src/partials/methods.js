@@ -288,10 +288,14 @@
             // get values from each variation spec
             for (var grid in specifications) {
               if (specifications.hasOwnProperty(grid)) {
+                var text = specValue(grid)
                 if (!grids.hasOwnProperty(grid)) {
                   grids[grid] = []
+                } else if (grids[grid].indexOf(text) !== -1) {
+                  // current spec value has already been added
+                  continue
                 }
-                grids[grid].push(specValue(grid))
+                grids[grid].push(text)
               }
             }
           }
