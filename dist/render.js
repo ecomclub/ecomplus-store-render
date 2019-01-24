@@ -970,8 +970,17 @@ var __ecom = {};
       // returns array of spec objects for specified grid
       var specValues = []
       if (Array.isArray(body)) {
-        // spec values list sent as body param
-        specValues = body
+        if (body.length) {
+          if (body[0].specifications) {
+            // variations array sent as body param
+            for (var i = 0; i < body.length; i++) {
+              specValues = specValues.concat(methods.specValues(body[i], grid))
+            }
+          } else if (body[0].text) {
+            // spec values list sent as body param
+            specValues = body
+          }
+        }
       } else {
         var specifications = body.specifications
         if (specifications) {
