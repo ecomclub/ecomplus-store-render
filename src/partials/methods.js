@@ -200,38 +200,6 @@
       return matchedCategories
     },
 
-    specTextValue: function (body, spec, delimiter) {
-      var specValues = []
-      if (Array.isArray(body)) {
-        // spec values list sent as body param
-        specValues = body
-      } else {
-        var specifications = body.specifications
-        if (specifications) {
-          for (var grid in specifications) {
-            if (specifications.hasOwnProperty(grid) && grid === spec) {
-              // specification found
-              specValues = specifications[grid]
-            }
-          }
-        }
-      }
-
-      if (specValues.length) {
-        var valuesString = specValues[0].text
-        if (!delimiter) {
-          // comma as default text delimiter
-          delimiter = ', '
-        }
-        for (var i = 1; i < specValues.length; i++) {
-          valuesString += delimiter + specValues[i].text
-        }
-        return valuesString
-      }
-      // specification not found
-      return null
-    },
-
     splitCategoryTree: function (body) {
       // parse category tree string to array
       var categories = []
@@ -252,6 +220,57 @@
       }
       // return array of categories
       return categories
+    },
+
+    specValues: function (body, grid) {
+      // returns array of spec objects for specified grid
+      var specValues = []
+      if (Array.isArray(body)) {
+        // spec values list sent as body param
+        specValues = body
+      } else {
+        var specifications = body.specifications
+        if (specifications) {
+          for (var Grid in specifications) {
+            if (specifications.hasOwnProperty(Grid) && Grid === grid) {
+              // specification found
+              specValues = specifications[grid]
+            }
+          }
+        }
+      }
+      return specValues
+    },
+
+    specTextValue: function (body, grid, delimiter) {
+      // parse specifications array of nested objects to string
+      // using text property of each spec object
+      var specValues = methods.specValues(body, grid)
+      if (specValues.length) {
+        var valuesString = specValues[0].text
+        if (!delimiter) {
+          // comma as default text delimiter
+          delimiter = ', '
+        }
+        for (var i = 1; i < specValues.length; i++) {
+          valuesString += delimiter + specValues[i].text
+        }
+        return valuesString
+      }
+      // specification not found
+      return null
+    },
+
+    specValueByText: function (body, grid, text) {
+      // get value property of spec object based on respective text
+      var specValues = methods.specValues(body, grid)
+      for (var i = 0; i < specValues.length; i++) {
+        if (specValues[i].text === text) {
+          return specValues[i].value
+        }
+      }
+      // any spec found for received grid and option text
+      return undefined
     },
 
     variationsGrids: function (body, filterGrids, delimiter) {
