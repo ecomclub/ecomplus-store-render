@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/ecomclub/ecomplus-store-render#readme",
   "dependencies": {
-    "ecomplus-sdk": "^1.11.0",
+    "ecomplus-sdk": "^1.15.0",
     "vue": "^2.5.17"
   },
   "devDependencies": {
