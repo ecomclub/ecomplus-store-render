@@ -16,7 +16,8 @@
     "storefront",
     "renderer",
     "vue",
-    "ecommerce"
+    "ecommerce",
+    "ecommerce-framework"
   ],
   "author": "E-Com Club",
   "license": "MIT",
