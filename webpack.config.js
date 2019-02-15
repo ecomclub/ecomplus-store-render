@@ -1,6 +1,7 @@
 'use strict'
 
 const path = require('path')
+const webpack = require('webpack')
 
 module.exports = {
   mode: 'development',
@@ -22,6 +23,9 @@ module.exports = {
       }
     }]
   },
+  plugins: [
+    new webpack.IgnorePlugin(/jsdom/)
+  ],
   stats: {
     colors: true
   },
