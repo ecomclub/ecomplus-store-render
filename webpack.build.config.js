@@ -1,8 +1,8 @@
 'use strict'
 
-// run builds for browser
 const config = require('./webpack.config.js')
 
+// run builds for browser
 // Polyfill + Vue + SDK + Render
 const production = Object.assign(config, {
   mode: 'production',
