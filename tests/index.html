@@ -10,8 +10,13 @@
 
     <title>E-Com Plus Store Render</title>
   </head>
-  <body>
+  <body class="_ecom-store" data-store="1011" data-id="5b1abe30a4d4531b8fe40725">
     <h1>Hello, world!</h1>
+    <div class="_ecom-el" data-type="store">
+      <a v-if="body.logo" href="#">
+        <img v-bind:src="body.logo.url" v-bind:alt="body.logo.alt">
+      </a>
+    </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
