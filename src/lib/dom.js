@@ -1,6 +1,16 @@
 'use strict'
 
-// setup DOM object with document property
+/**
+ * Setup DOM object with document property.
+ * Should receive only one of possible params.
+ * @namespace
+ * @type {function}
+ * @param {string} [html] - HTML string to render
+ * @param {string} [url] - Page link
+ * @param {string} [file] - Path of HTML file
+ * @param {object} [dom] - Parsed DOM object
+ */
+
 const DOM = (html, url, file, dom) => {
   if (dom) {
     // hard set
@@ -23,6 +33,13 @@ const DOM = (html, url, file, dom) => {
       (url ? JSDOM.fromURL(url) : JSDOM.fromFile(file))
         .then(newDom => { dom = newDom })
     }
+
+    /**
+     * Document object.
+     * @type {object}
+     * @memberOf DOM
+     */
+
     DOM.document = dom.window.document
   }
 }

@@ -6,18 +6,21 @@
 
 'use strict'
 
-// create Ecom object with library methods
-// render entire document
-const init = require('./lib/init')
-// render specific elements manually
-const render = require('./lib/render')
-// render main object
-const Ecom = {
-  init,
-  render
-}
+/**
+ * Ecom object with renderer methods.
+ * @namespace
+ */
 
-// exports function to handle DOM before returning Ecom object
+const Ecom = require('./render/')
+
+/**
+ * Exports function to call {@link DOM} and return {@link Ecom} object.
+ * @module ecomplus-render
+ * @see DOM
+ * @returns {@link Ecom}
+ * @example const Ecom = require('ecomplus-render')(html)
+ */
+
 module.exports = function () {
   // setup DOM
   // bypass all arguments
