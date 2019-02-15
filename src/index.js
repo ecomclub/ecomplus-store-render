@@ -4,76 +4,54 @@
  * @license MIT
  */
 
-// set auxiliar global object
-var __ecom = {};
+'use strict'
 
-(function () {
-  'use strict'
+// create Ecom object with library methods
+// render entire document
+const init = require('./lib/init')
+// render specific elements manually
+const render = require('./lib/render')
+// render main object
+const Ecom = {
+  init,
+  render
+}
 
-  /*
-    Handle compatibility with Node.js, RequireJS as well as without them
-    No bundlers or transpilers
-    Based on UnderscoreJS implementation:
-    https://github.com/jashkenas/underscore/blob/master/underscore.js
-  */
+// exports function to handle DOM before returning Ecom object
+module.exports = function () {
+  // setup DOM
+  // bypass all arguments
+  require('./lib/dom')(this, arguments)
+  return Ecom
+}
 
-  // Establish the root object, `window` (`self`) in the browser, `global`
-  // on the server, or `this` in some virtual machines. We use `self`
-  // instead of `window` for `WebWorker` support.
-  /* global self */
-  var root = (typeof self === 'object' && self.self === self && self) ||
-             (typeof global === 'object' && global.global === global && global) ||
-             this ||
-             {}
-
-  // main object
-  var Ecom = {}
-  __ecom = {
-    Ecom: Ecom,
-    root: root,
-    // utility functions
-    _: {}
-  }
-
-  // load dependencies
-  var libs = {
-    Vue: 'vue',
-    EcomIo: 'ecomplus-sdk'
-  }
-  for (var lib in libs) {
-    if (libs.hasOwnProperty(lib)) {
-      var pack = libs[lib]
-
-      // handle require function with compatibility
-      if (root.hasOwnProperty(lib)) {
-        // get from global
-        __ecom[lib] = root[lib]
-      } else if (typeof require === 'function') {
-        // require module
-        __ecom[lib] = require(pack)
-      } else {
-        console.error(lib + ' (`' + pack + '`) is required and undefined')
-        return
-      }
-    }
-  }
-
-  // Export the Ecom object for **Node.js**, with
-  // backwards-compatibility for their old module API. If we're in
-  // the browser, add `Ecom` as a global object.
-  // (`nodeType` is checked to ensure that `module`
-  // and `exports` are not HTML elements.)
-  if (typeof exports !== 'undefined' && !exports.nodeType) {
-    // handle exports
-    if (typeof module !== 'undefined' && module.exports && !module.nodeType) {
-      exports = module.exports = Ecom
-    }
-    exports.Ecom = Ecom
+if (typeof window === 'object' && window.document) {
+  // on browser
+  // setup dependencies
+  // save libraries globally
+  let Vue
+  if (!window.Vue) {
+    Vue = require('vue')
+    window.Vue = Vue
   } else {
-    // set object on root
-    root.Ecom = Ecom
+    Vue = window.Vue
   }
-}())
+  if (!window.EcomIo) {
+    window.EcomIo = require('ecomplus-sdk')
+  }
+  window.Ecom = Ecom
 
-// concatenate scripts
-// require('partials/**')
+  // config global Vue constructor
+  Vue.default.config.errorHandler = (err, vm, info) => {
+    console.error(err)
+    // identify the instance
+    console.log('Vue instance with error, $el and $data:')
+    console.log(vm.$el)
+    console.log(vm.$data)
+    console.log(info)
+    console.log('-----//-----')
+  }
+}
+
+// handle command line task
+require('./cli')
