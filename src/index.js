@@ -54,6 +54,9 @@ if (typeof window === 'object' && window.document) {
     console.log(info)
     console.log('-----//-----')
   }
+
+  // polyfill Promises
+  require('es6-promise').polyfill()
 }
 
 // handle command line task
