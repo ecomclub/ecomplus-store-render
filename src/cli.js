@@ -1,12 +1,20 @@
 'use strict'
 
 if (typeof process === 'object' && Array.isArray(process.argv)) {
-  // NodeJS cli
-  // node index.js input.html output.html
-  if (process.argv.length >= 4) {
-    // setup DOM
-    require('./lib/dom')(process.argv[3])
-    // render entire document
-    // require('./init')()
+  // NodeJS CLI
+  // node ./index.js https://www.mystore.com.br/product
+  if (process.argv.length >= 3) {
+    // setup DOM first
+    let url = process.argv[2]
+
+    require('./lib/dom')(null, url)
+      .then(() => {
+        // render entire document
+        require('./ecom').init()
+      })
+      .catch(err => {
+        // jsdom error
+        throw err
+      })
   }
 }
