@@ -24,7 +24,7 @@ module.exports = {
     }]
   },
   plugins: [
-    new webpack.IgnorePlugin(/jsdom/)
+    new webpack.IgnorePlugin(/(jsdom|\.\/cli)/)
   ],
   resolve: {
     alias: {
