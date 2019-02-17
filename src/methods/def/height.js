@@ -9,6 +9,6 @@ const splitImgSize = require('./../aux/splitImgSize')
  * @returns {string}
  */
 
-const width = imgBody => splitImgSize(imgBody, 1) || ''
+const height = imgBody => splitImgSize(imgBody, 1) || ''
 
-module.exports = width
+module.exports = height
