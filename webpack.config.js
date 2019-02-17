@@ -26,6 +26,11 @@ module.exports = {
   plugins: [
     new webpack.IgnorePlugin(/jsdom/)
   ],
+  resolve: {
+    alias: {
+      vue: 'vue/dist/vue.js'
+    }
+  },
   stats: {
     colors: true
   },
