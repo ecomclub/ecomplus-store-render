@@ -28,3 +28,34 @@ exports.getCookie = cname => {
   // returns null by default
   return null
 }
+
+// nested search on DOM by class
+const findChildsByClass = (container, className, els) => {
+  // returns array of DOM elements
+  if (!Array.isArray(els)) {
+    els = []
+  }
+
+  if (container.childNodes) {
+    for (var i = 0; i < container.childNodes.length; i++) {
+      var el = container.childNodes[i]
+      var classes = el.classList
+      if (classes) {
+        for (var ii = 0; ii < classes.length; ii++) {
+          if (classes[ii] === className) {
+            // match
+            // el.deep = deep
+            els.push(el)
+            break
+          }
+        }
+      }
+
+      // go deeper
+      // recursive function
+      findChildsByClass(el, className, els)
+    }
+  }
+  return els
+}
+exports.findChildsByClass = findChildsByClass

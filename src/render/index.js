@@ -1,86 +1,60 @@
 'use strict'
 
-/**
- * Stores list.
- * @memberOf Ecom
- * @type {array}
- */
+// VueJS 2
+const Vue = require('vue')
+// Ecom methods for Vue instance
+const methods = require('./../methods/')
 
-const stores = []
-
-/**
- * Render entire document.
- * @memberOf Ecom
- * @param {function} [callback] - Render callback function
- * @param {integer} [storeId] - Store ID
- * @param {string} [storeObjectId] - 24 bytes hexadecimal Store Object ID
- * @param {string} [lang] - Force language by code such as 'en_us'
- */
-
-const init = (callback, storeId, storeObjectId, lang) => {
-  if (typeof window === 'object') {
-    // debug on browser
-    console.log('Init E-Com Plus store rendering')
+module.exports = (store, el, body) => {
+  // pass store properties to instance data
+  if (store) {
+    body.Store = store
   }
 
-  // get document object
-  const { document } = require('./../lib/dom')
-  if (!document) {
-    throw new Error('Root `document` (DOM) object is undefined or invalid')
+  if (typeof Ecom === 'object') {
+    // on browser
+    /* global Ecom */
+    if (!store && Ecom.stores.length) {
+      // use first recognized store
+      body.Store = Ecom.stores[0]
+    }
+    if (!Ecom.hasOwnProperty('currentObject') && el.dataset.current === 'true') {
+      // force as current object
+      Ecom.currentObject = body
+    }
   }
 
-  if (storeId && storeObjectId) {
-    // set store from function arguments
-    store = {
-      'store_id': parseInt(storeId, 10),
-      'store_object_id': storeObjectId
+  // handle element data
+  let data = { body }
+  // get custom variables from data-payload
+  if (el.dataset.hasOwnProperty('payload')) {
+    try {
+      data.payload = JSON.parse(el.dataset.payload)
+    } catch (e) {
+      console.log('Ignoring invalid element payload:')
+      console.log(el)
     }
-    if (lang) {
-      store.lang = lang
-    }
-    stores.push(store)
-  } else {
-    // try to set store from HTML DOM
-    var domStores = root['document'].getElementsByClassName('_ecom-store')
-    if (typeof domStores === 'object' && domStores !== null) {
-      for (i = 0; i < domStores.length; i++) {
-        var el = domStores[i]
-        store = {
-          'el': el
+  }
+
+  // create new Vue instance
+  return new Promise(resolve => {
+    let vm = new Vue({
+      // set Vue mixin
+      mixins: [ { methods } ],
+      el,
+      data,
+      destroyed: () => {
+        // mark element as rendered
+        let el = this.$el
+        if (typeof el === 'object' && el !== null && el.classList) {
+          el.classList.add('rendered')
         }
-        // check data properties
-        if (el.dataset.store && el.dataset.id) {
-          store.store_id = parseInt(el.dataset.store, 10)
-          store.store_object_id = el.dataset.id
-        }
-        if (el.dataset.lang) {
-          store.lang = el.dataset.lang
-        }
-        stores.push(store)
+        // element done
+        resolve()
       }
-    }
-  }
+    })
 
-  // start rendering
-  if (stores.length) {
-    i = 0
-    // set renderization callback
-    cb = function () {
-      i++
-      if (i < stores.length) {
-        render(stores[i])
-      } else if (typeof callback === 'function') {
-        // all done
-        // handle renderization callback param
-        callback()
-      }
-    }
-    // first store
-    render(stores[i])
-  }
-}
-
-module.exports = {
-  init,
-  stores
+    // destroy Vue instace after element rendering
+    vm.$destroy()
+  })
 }
