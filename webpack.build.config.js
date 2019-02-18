@@ -1,5 +1,6 @@
 'use strict'
 
+const webpack = require('webpack')
 const config = require('./webpack.config.js')
 
 // run builds for browser
@@ -17,4 +18,14 @@ const production = Object.assign(config, {
   }
 })
 
-module.exports = production
+// build render standalone
+const standalone = Object.assign({}, production, {
+  output: {
+    filename: 'render.min.js'
+  },
+  plugins: production.plugins.concat([
+    new webpack.IgnorePlugin(/(vue|ecomplus-sdk|es6-promise)/)
+  ])
+})
+
+module.exports = [ production, standalone ]

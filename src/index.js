@@ -8,8 +8,10 @@
 
 if (typeof window === 'object' && window.document) {
   // on browser
-  // polyfill Promises
-  require('es6-promise').polyfill()
+  if (typeof Promise === 'undefined') {
+    // polyfill Promises
+    require('es6-promise').polyfill()
+  }
 
   // setup dependencies globally
   let Vue
