@@ -6,6 +6,8 @@
 
 Render E-Com Plus store templates with Vue.js 2.
 
+[Storefront theme documentation](https://developers.e-com.plus/docs/themes/).
+
 ## Browser
 
 ### Recommended
@@ -33,8 +35,6 @@ you can also include the
 [npm package](https://www.npmjs.com/package/ecomplus-render):
 
 `npm install --save ecomplus-render`
-
-[Storefront theme documentation](https://developers.e-com.plus/docs/themes/).
 
 ## Server side rendering
 
