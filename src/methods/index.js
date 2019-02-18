@@ -13,7 +13,7 @@ const methods = {}
 const addVueMethod = (name, func) => {
   methods[name] = (function () {
     // scoped
-    return () => {
+    return function () {
       // convert arguments array-like object to array
       let args = []
       for (let i = 0; i < arguments.length; i++) {
