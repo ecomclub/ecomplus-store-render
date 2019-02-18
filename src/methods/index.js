@@ -32,13 +32,6 @@ const addVueMethod = (name, func) => {
   }())
 }
 
-if (typeof Ecom === 'object') {
-  // on browser
-  /* global Ecom */
-  // expose function to support custom methods
-  Ecom.addVueMethod = addVueMethod
-}
-
 /**
  * Ecom auxiliary methods for Vue instances.
  * @namespace Ecom.methods
