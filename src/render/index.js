@@ -5,7 +5,28 @@ const Vue = require('vue')
 // Ecom methods for Vue instance
 const methods = require('./../methods/')
 
-module.exports = (store, el, body) => {
+// setup Vue mixin for all instances
+const vueMixin = {
+  methods,
+  mounted () {
+    // destroy Vue instace after element rendering
+    this.$destroy()
+    // mark element as rendered
+    if (this.$el) {
+      this.$el.classList.add('rendered')
+    }
+  }
+}
+
+/**
+ * Render specific DOM element.
+ * @memberOf Ecom
+ * @param {object} [store] - Store object with IDs
+ * @param {object} el - DOM element object
+ * @param {object} body - Body object to compose Vue instance data
+ */
+
+const render = (store, el, body) => {
   // pass store properties to instance data
   if (store) {
     body.Store = store
@@ -36,30 +57,34 @@ module.exports = (store, el, body) => {
     }
   }
 
-  // save the original template on new script tag
-  let tmp = document.createElement('script')
-  tmp.setAttribute('type', 'text/x-template')
-  tmp.innerHTML = el.innerHTML
-  // insert after the ._ecom-el element
-  el.parentNode.insertBefore(tmp, el.nextSibling)
+  let template
+  if (el.dataset.serverRendered) {
+    // element already rendered server side
+    // setup client side hydration
+    let script = el.nextSibling
+    if (script && script.tagName === 'SCRIPT') {
+      template = el.nextSibling.innerHTML
+      // unset to prevent Vue warn
+      delete el.dataset.serverRendered
+    }
+  }
 
   return new Promise(resolve => {
-    // create new Vue instance
-    new Vue({
-      mixins: [ { methods } ],
-      data,
-      mounted () {
-        // destroy Vue instace after element rendering
-        this.$destroy()
-      },
-      destroyed () {
-        // mark element as rendered
-        if (this.$el) {
-          this.$el.classList.add('rendered')
-        }
-        // element done
-        resolve()
-      }
-    }).$mount(el)
+    if (typeof window === 'object' && window.document) {
+      // on browser
+      // create new Vue instance
+      new Vue({
+        mixins: [ vueMixin ],
+        data,
+        template,
+        destroyed: resolve
+      }).$mount(el)
+    } else {
+      // NodeJS ?
+      // handle server side rendering
+      require('./ssr')(el, data).finally(resolve)
+    }
   })
 }
+
+module.exports = render
