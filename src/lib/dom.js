@@ -50,6 +50,9 @@ const DOM = (html, url, file, dom) => {
        */
 
       DOM.location = dom.window.location
+
+      // pass dom to next function
+      return dom
     })
 }
 
