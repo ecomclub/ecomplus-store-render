@@ -36,25 +36,30 @@ module.exports = (store, el, body) => {
     }
   }
 
-  // create new Vue instance
+  // save the original template on new script tag
+  let tmp = document.createElement('script')
+  tmp.setAttribute('type', 'text/x-template')
+  tmp.innerHTML = el.innerHTML
+  // insert after the ._ecom-el element
+  el.parentNode.insertBefore(tmp, el.nextSibling)
+
   return new Promise(resolve => {
-    let vm = new Vue({
-      // set Vue mixin
+    // create new Vue instance
+    new Vue({
       mixins: [ { methods } ],
-      el,
       data,
-      destroyed: () => {
+      mounted () {
+        // destroy Vue instace after element rendering
+        this.$destroy()
+      },
+      destroyed () {
         // mark element as rendered
-        let el = this.$el
-        if (typeof el === 'object' && el !== null && el.classList) {
-          el.classList.add('rendered')
+        if (this.$el) {
+          this.$el.classList.add('rendered')
         }
         // element done
         resolve()
       }
-    })
-
-    // destroy Vue instace after element rendering
-    vm.$destroy()
+    }).$mount(el)
   })
 }
