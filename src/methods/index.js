@@ -3,9 +3,8 @@
 // auxiliary methods for Vue instances
 const methods = {}
 
-/**
+/*
  * Add custom method to Vue instances.
- * @memberOf Ecom
  * @param {string} name - Name of custom method
  * @param {function} func - The method itself (function)
  */
