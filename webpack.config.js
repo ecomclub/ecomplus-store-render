@@ -24,7 +24,7 @@ module.exports = {
     }]
   },
   plugins: [
-    new webpack.IgnorePlugin(/(jsdom|\.\/cli)/)
+    new webpack.IgnorePlugin(/(jsdom|vue-server-renderer|\.\/cli|\.\/ssr)/)
   ],
   resolve: {
     alias: {
