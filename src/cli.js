@@ -8,9 +8,12 @@ if (typeof process === 'object' && Array.isArray(process.argv)) {
     let url = process.argv[2]
 
     require('./lib/dom')(null, url)
-      .then(() => {
+      .then(dom => {
         // render entire document
-        require('./ecom').init()
+        require('./ecom').init().then(() => {
+          console.log(dom.serialize())
+          process.exit(0)
+        })
       })
       .catch(err => {
         // jsdom error

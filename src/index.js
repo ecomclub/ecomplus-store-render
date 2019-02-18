@@ -6,32 +6,12 @@
 
 'use strict'
 
-/**
- * Ecom object with renderer methods.
- * @namespace
- */
-
-const Ecom = require('./ecom')
-
-/**
- * Exports function to call {@link DOM} and return {@link Ecom} object.
- * @module ecomplus-render
- * @see DOM
- * @returns {Promise} {@link Ecom}
- * @example require('ecomplus-render')(html).then(Ecom => Ecom.init())
- */
-
-module.exports = function () {
-  // setup DOM
-  // bypass all arguments
-  return require('./lib/dom')(this, arguments)
-    .then(() => Promise.resolve(Ecom))
-}
-
 if (typeof window === 'object' && window.document) {
   // on browser
-  // setup dependencies
-  // save libraries globally
+  // polyfill Promises
+  require('es6-promise').polyfill()
+
+  // setup dependencies globally
   let Vue
   if (!window.Vue) {
     Vue = require('vue')
@@ -42,7 +22,6 @@ if (typeof window === 'object' && window.document) {
   if (!window.EcomIo) {
     window.EcomIo = require('ecomplus-sdk')
   }
-  window.Ecom = Ecom
 
   // config global Vue constructor
   if (Vue.config) {
@@ -57,10 +36,53 @@ if (typeof window === 'object' && window.document) {
     }
   }
 
-  // polyfill Promises
-  require('es6-promise').polyfill()
-} else {
+  /**
+   * Ecom object with renderer methods.
+   * @namespace
+   */
+
+  const Ecom = require('./ecom')
+  window.Ecom = Ecom
+
+  // automatic handlers for browser
+  // check <body> data
+  let dataset = document.body.dataset
+  let initPromise
+  if (!dataset.ecomWait) {
+    // start renderization automatically
+    initPromise = Ecom.init()
+  }
+
+  if (typeof $ === 'function' && !dataset.ecomSkipJquery) {
+    // delay jQuery ready event to improve compatibility
+    /* global $ */
+    $.holdReady(true)
+    initPromise.then(() => $.holdReady(false))
+  }
+} else if (require.main !== module) {
   // NodeJS ?
+
+  /**
+   * Exports function to call {@link DOM} setup and return {@link Ecom} object.
+   * @module ecomplus-render
+   * @see DOM
+   * @returns {Promise} {@link Ecom}
+   * @example require('ecomplus-render')(html).then(({ dom, Ecom }) => Ecom.init())
+   */
+
+  module.exports = function () {
+    // setup DOM
+    // bypass all arguments
+    return require('./lib/dom').apply(this, arguments).then(dom => {
+      // pass dom (jsdom) and Ecom objects to next function
+      return {
+        dom,
+        Ecom: require('./ecom')
+      }
+    })
+  }
+} else {
+  // called directly
   // handle command line task
   require('./cli')
 }

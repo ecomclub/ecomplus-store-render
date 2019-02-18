@@ -18,13 +18,12 @@ const stores = []
 /**
  * Render entire document.
  * @memberOf Ecom
- * @param {function} [callback] - Render callback function
  * @param {integer} [storeId] - Store ID
  * @param {string} [storeObjectId] - 24 bytes hexadecimal Store Object ID
  * @param {string} [lang] - Force language by code such as 'en_us'
  */
 
-const init = (callback, storeId, storeObjectId, lang) => {
+const init = (storeId, storeObjectId, lang) => {
   if (typeof window === 'object') {
     // debug on browser
     console.log('Init E-Com Plus store rendering')
@@ -72,14 +71,8 @@ const init = (callback, storeId, storeObjectId, lang) => {
   stores.forEach(store => {
     promises.push(renderStore(store))
   })
-  if (typeof callback === 'function') {
-    // renderization callback
-    Promise.all(promises).then(() => {
-      // all done
-      // handle callback function
-      callback()
-    })
-  }
+  // return promise resolved when all stores are rendered
+  return Promise.all(promises)
 }
 
 module.exports = { init, stores, render, methods }
