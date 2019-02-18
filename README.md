@@ -4,41 +4,90 @@
 [![npm version](https://img.shields.io/npm/v/ecomplus-render.svg)](https://www.npmjs.org/ecomplus-render)
 [![license mit](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Vue.js app to render E-Com Plus store template.
+Render E-Com Plus store templates with Vue.js 2.
 
-It **requires** global `EcomIo` object from
-[storefront JS SDK](https://github.com/ecomclub/ecomplus-sdk-js).
+## Browser
 
-Include minified script via CDN:
+### Recommended
+
+Include minified bundler via CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/ecomplus-render@2/dist/render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ecomplus-render@3/dist/storefront.min.js"></script>
 ```
 
-Or install [npm package](https://www.npmjs.com/package/ecomplus-render):
+### Standalone
+
+You can include the render standalone, it **requires** global `EcomIo` object from
+[storefront JS SDK](https://github.com/ecomclub/ecomplus-sdk-js) and
+[Vue](https://vuejs.org/v2/guide/#Getting-Started):
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/ecomplus-render@3/dist/render.min.js"></script>
+```
+
+### With bundlers
+
+If using `webpack` or `browserify` (or relateds),
+you can also include the
+[npm package](https://www.npmjs.com/package/ecomplus-render):
 
 `npm install --save ecomplus-render`
 
 [Storefront theme documentation](https://developers.e-com.plus/docs/themes/).
 
-## Compiling
+## Server side rendering
 
-You must have *gulp* installed globally:
+The package is also compatible with NodeJS backend,
+handling SSR with
+[jsdom](https://github.com/jsdom/jsdom) and
+[Vue SSR](https://ssr.vuejs.org/).
 
-```bash
-npm install -g gulp
-```
+Even rendered pages must include the render to run on browser,
+HTML will be updated (hydrate) client-side
+to keep critical data always up to date.
 
-Setup dev dependencies:
+### Command line
 
 ```bash
 cd ecomplus-store-render
-npm install --only=dev
+node src/index.js https://mystore.com/product > product.html
 ```
 
-Run tasks:
+### Node
+
+```javascript
+require('ecomplus-render')(html).then(({ dom, Ecom }) => {
+  Ecom.init().then(dom => {
+    // jsdom object
+    console.log(dom.serialize())
+  })
+})
+```
+
+## Developing
+
+Setup the package with NPM:
 
 ```bash
-gulp concat
-gulp compress
+cd ecomplus-store-render
+npm i
+```
+
+Watch tests server:
+
+```bash
+npm run serve
+```
+
+Update JSDoc files on `docs` folder:
+
+```bash
+npm run doc
+```
+
+Compile to production:
+
+```bash
+npm run build
 ```
