@@ -5,7 +5,24 @@ const EcomIo = require('ecomplus-sdk')
 // render specific element
 const render = require('./../')
 
-module.exports = (store, el, presetBody) => {
+// reusable load body function
+const load = (searchCallback, args) => {
+  // call Search API
+  EcomIo.searchProducts(
+    searchCallback,
+    args.term,
+    args.from,
+    args.size,
+    args.sort,
+    args.specs,
+    args.ids,
+    args.brands,
+    args.categories,
+    args.prices
+  )
+}
+
+const searchItems = (store, el, presetBody) => {
   // check for search arguments
   const args = {}
   for (let data in el.dataset) {
@@ -68,26 +85,16 @@ module.exports = (store, el, presetBody) => {
           // merge with Search API response
           body = Object.assign(presetBody, body)
         }
-        render(store, el, body).then(resolve)
+        render(store, el, body, load, args).then(resolve)
       } else {
         console.error(err)
         // resolve the promise anyway
         resolve()
       }
     }
-
-    // call Search API
-    EcomIo.searchProducts(
-      searchCallback,
-      args.term,
-      args.from,
-      args.size,
-      args.sort,
-      args.specs,
-      args.ids,
-      args.brands,
-      args.categories,
-      args.prices
-    )
+    // first body load
+    load(searchCallback, args)
   })
 }
+
+module.exports = searchItems
