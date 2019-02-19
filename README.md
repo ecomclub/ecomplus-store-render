@@ -6,13 +6,15 @@
 
 Render E-Com Plus store templates with Vue.js 2.
 
-[Storefront theme documentation](https://developers.e-com.plus/docs/themes/).
+**[Storefront themes documentation](https://developers.e-com.plus/docs/themes/)**
+
+[Renderer API reference](https://developers.e-com.plus/ecomplus-store-render/)
 
 ## Browser
 
 ### Recommended
 
-Include minified bundler via CDN:
+Include minified bundle via CDN:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/ecomplus-render@3/dist/storefront.min.js"></script>

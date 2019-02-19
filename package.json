@@ -6,7 +6,7 @@
   "scripts": {
     "serve": "webpack-dev-server",
     "build": "webpack --config webpack.build.config.js",
-    "doc": "jsdoc src -r -d docs"
+    "doc": "jsdoc src -r README.md -d docs"
   },
   "repository": {
     "type": "git",
