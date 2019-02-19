@@ -6,14 +6,21 @@ const Vue = require('vue')
 const methods = require('./../methods/')
 
 // setup Vue mixin for all instances
+// used on browser only
 const vueMixin = {
   methods,
   mounted () {
-    // destroy Vue instace after element rendering
-    this.$destroy()
-    // mark element as rendered
-    if (this.$el) {
-      this.$el.classList.add('rendered')
+    let el = this.$el
+    if (el) {
+      if (!el.dataset.vm) {
+        // destroy Vue instace after element rendering
+        this.$destroy()
+        // mark element as rendered
+        el.classList.add('rendered')
+      } else {
+        // save Vue instance globally
+        window[el.dataset.vm] = this
+      }
     }
   }
 }
