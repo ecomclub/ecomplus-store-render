@@ -61,11 +61,6 @@ const render = (store, el, body) => {
       // on browser
       // create new Vue instance
       new Vue({
-        data,
-        template,
-        methods,
-        destroyed: resolve,
-
         mounted () {
           let el = this.$el
           if (el) {
@@ -74,13 +69,18 @@ const render = (store, el, body) => {
               this.$destroy()
               // mark element as rendered
               el.classList.add('rendered')
-            } else {
-              // save Vue instance globally
-              window[el.dataset.vm] = this
-              resolve()
+              return
             }
+            // save Vue instance globally
+            window[el.dataset.vm] = this
           }
-        }
+          resolve()
+        },
+
+        data,
+        template,
+        methods,
+        destroyed: resolve
       }).$mount(el)
     } else {
       // NodeJS ?
