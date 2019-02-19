@@ -60,3 +60,24 @@ module.exports = methods
 ].forEach(name => {
   addVueMethod(name, require('./def/' + name + '.js'))
 })
+
+// handle custom methods from window object on browser
+methods.fn = function (method, args) {
+  if (typeof window === 'object') {
+    // try to call global function
+    let fn = window[method]
+    if (typeof fn === 'function') {
+      return fn({
+        // pass body object from instance data
+        body: (this.$data && this.$data.body) || {},
+        // bypass received args
+        args
+      })
+    } else {
+      // debug
+      console.log('WARN: window.' + method + ' isn\'t a function', this.$el)
+    }
+  }
+  // returns null by default
+  return null
+}
