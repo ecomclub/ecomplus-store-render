@@ -11,9 +11,11 @@ const methods = require('./../methods/')
  * @param {object} [store] - Store object with IDs
  * @param {object} el - DOM element object
  * @param {object} body - Body object to compose Vue instance data
+ * @param {function} [load] - Load function to update body on instance data
+ * @param {mixed} [args] - Compose data and work as filters to reload
  */
 
-const render = (store, el, body) => {
+const render = (store, el, body, load, args) => {
   // pass store properties to instance data
   if (store) {
     body.Store = store
@@ -33,7 +35,7 @@ const render = (store, el, body) => {
   }
 
   // handle element data
-  let data = { body }
+  let data = { body, args }
   // get custom variables from data-payload
   if (el.dataset.hasOwnProperty('payload')) {
     try {
@@ -59,6 +61,26 @@ const render = (store, el, body) => {
   return new Promise(resolve => {
     if (typeof window === 'object' && window.document) {
       // on browser
+      // setup reload method
+      let reload = function () {
+        if (typeof load === 'function') {
+          let vm = this
+          let callback = (err, body) => {
+            if (err) {
+              console.error(err)
+            } else if (body) {
+              // reactive update of instance data
+              vm.body = body
+            }
+          }
+
+          // run load function with args from instance data
+          load(callback, vm.args)
+        } else {
+          console.log('WARN: no load function', this.$el)
+        }
+      }
+
       // create new Vue instance
       new Vue({
         mounted () {
@@ -79,7 +101,7 @@ const render = (store, el, body) => {
 
         data,
         template,
-        methods,
+        methods: Object.assign({ reload }, methods),
         destroyed: resolve
       }).$mount(el)
     } else {
