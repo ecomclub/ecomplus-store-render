@@ -24,7 +24,7 @@ const standalone = Object.assign({}, production, {
     filename: 'render.min.js'
   },
   plugins: production.plugins.concat([
-    new webpack.IgnorePlugin(/(vue|ecomplus-sdk|es6-promise)/)
+    new webpack.IgnorePlugin(/(vue|ecomplus-sdk)/)
   ])
 })
 

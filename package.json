@@ -27,9 +27,9 @@
   },
   "homepage": "https://github.com/ecomclub/ecomplus-store-render#readme",
   "dependencies": {
+    "@babel/polyfill": "^7.2.5",
     "@babel/runtime": "^7.3.1",
     "ecomplus-sdk": "^1.15.7",
-    "es6-promise": "^4.2.6",
     "jsdom": "^13.2.0",
     "vue": "^2.6.6",
     "vue-server-renderer": "^2.6.6"
