@@ -12,7 +12,7 @@
   </head>
   <body class="_ecom-store" data-store="1011" data-id="5b1abe30a4d4531b8fe40725">
     <h1>Hello, world!</h1>
-    <div class="_ecom-el" data-type="store">
+    <div class="_ecom-el" v-bind:class="'rendered'" data-type="store" data-vm="Store">
       <a v-if="body.logo" href="#">
         <img v-bind:src="body.logo.url" v-bind:alt="body.logo.alt" v-bind:width="width(body.logo)">
       </a>
