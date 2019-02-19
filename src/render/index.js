@@ -5,26 +5,6 @@ const Vue = require('vue')
 // Ecom methods for Vue instance
 const methods = require('./../methods/')
 
-// setup Vue mixin for all instances
-// used on browser only
-const vueMixin = {
-  methods,
-  mounted () {
-    let el = this.$el
-    if (el) {
-      if (!el.dataset.vm) {
-        // destroy Vue instace after element rendering
-        this.$destroy()
-        // mark element as rendered
-        el.classList.add('rendered')
-      } else {
-        // save Vue instance globally
-        window[el.dataset.vm] = this
-      }
-    }
-  }
-}
-
 /**
  * Render specific DOM element.
  * @memberOf Ecom
@@ -81,10 +61,26 @@ const render = (store, el, body) => {
       // on browser
       // create new Vue instance
       new Vue({
-        mixins: [ vueMixin ],
         data,
         template,
-        destroyed: resolve
+        methods,
+        destroyed: resolve,
+
+        mounted () {
+          let el = this.$el
+          if (el) {
+            if (!el.dataset.vm) {
+              // destroy Vue instace after element rendering
+              this.$destroy()
+              // mark element as rendered
+              el.classList.add('rendered')
+            } else {
+              // save Vue instance globally
+              window[el.dataset.vm] = this
+              resolve()
+            }
+          }
+        }
       }).$mount(el)
     } else {
       // NodeJS ?
