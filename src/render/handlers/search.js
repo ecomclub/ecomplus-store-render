@@ -7,71 +7,53 @@ const render = require('./../')
 
 module.exports = (store, el, presetBody) => {
   // check for search arguments
-  const arg = {}
+  const args = {}
   for (let data in el.dataset) {
     if (el.dataset.hasOwnProperty(data)) {
+      // filter value
+      let value = el.dataset[data]
       switch (data) {
         case 'term':
-          arg[data] = el.dataset[data]
+          args[data] = value
           break
 
         case 'from':
         case 'size':
         case 'sort':
-          arg[data] = parseInt(el.dataset[data], 10)
+          args[data] = parseInt(value, 10)
           break
 
         case 'ids':
         case 'brands':
         case 'categories':
-          // list separated by ,
+          // list separated by double bars
           // to array
-          arg[data] = el.dataset[data].split(',')
+          args[data] = value.split('||')
           break
 
         case 'priceMin':
-          if (!arg.hasOwnProperty('prices')) {
-            // preset object
-            arg.prices = {}
-          }
-          arg.prices.min = parseFloat(el.dataset[data])
-          break
-
         case 'priceMax':
-          if (!arg.hasOwnProperty('prices')) {
+          if (!args.hasOwnProperty('prices')) {
             // preset object
-            arg.prices = {}
+            args.prices = {}
           }
-          arg.prices.max = parseFloat(el.dataset[data])
+          // eg.: \priceM\in -> min
+          args.prices['m' + data.substr(6)] = parseFloat(value)
           break
 
         default:
           // check specs
           if (data.startsWith('spec')) {
-            if (!arg.hasOwnProperty('specs')) {
+            if (!args.hasOwnProperty('specs')) {
               // preset object
-              arg.specs = {}
+              args.specs = {}
             }
             // lowercase specification name
-            // eg.: specColors -> colors
+            // eg.: \spec\Colors -> colors
             let spec = data.charAt(4).toLowerCase() + data.substr(5)
-            // specification value
-            let value = el.dataset[data]
-
-            if (value.charAt(0) === '[') {
-              // can be a JSON array
-              try {
-                let array = JSON.parse(value)
-                if (Array.isArray(array)) {
-                  arg.specs[spec] = array
-                }
-              } catch (e) {
-                // continue only
-              }
-            }
-            if (!arg.specs.hasOwnProperty(spec)) {
-              arg.specs[spec] = [ value ]
-            }
+            // list separated by double bars
+            // specification values array
+            args.specs[spec] = value.split('||')
           }
       }
     }
@@ -97,15 +79,15 @@ module.exports = (store, el, presetBody) => {
     // call Search API
     EcomIo.searchProducts(
       searchCallback,
-      arg.term,
-      arg.from,
-      arg.size,
-      arg.sort,
-      arg.specs,
-      arg.ids,
-      arg.brands,
-      arg.categories,
-      arg.prices
+      args.term,
+      args.from,
+      args.size,
+      args.sort,
+      args.specs,
+      args.ids,
+      args.brands,
+      args.categories,
+      args.prices
     )
   })
 }
