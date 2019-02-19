@@ -21,11 +21,17 @@ module.exports = (el, data) => {
     el.parentNode.insertBefore(script, el.nextSibling)
 
     // new Vue instance
+    // assing additional methods (browser only) to prevent Vue error
+    let fn = () => {
+      // do nothing
+      return null
+    }
+    let reload = fn
     // manually set template and keep Vue instance unmounted
     const vm = new Vue({
       data,
       template,
-      methods
+      methods: Object.assign({ fn, reload }, methods)
     })
 
     // do the renderization
