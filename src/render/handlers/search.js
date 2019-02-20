@@ -7,10 +7,16 @@ const render = require('./../')
 
 // reusable load body function
 const load = (searchCallback, args) => {
+  // prevent search with empty term (no results)
+  let term = args.term && args.term.trim()
+  if (term === '') {
+    term = null
+  }
+
   // call Search API
   EcomIo.searchProducts(
     searchCallback,
-    args.term,
+    term,
     args.from,
     args.size,
     args.sort,
