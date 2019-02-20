@@ -22,16 +22,16 @@ module.exports = (el, data) => {
 
     // new Vue instance
     // assing additional methods (browser only) to prevent Vue error
-    let fn = () => {
+    let reload, run, set
+    reload = run = set = () => {
       // do nothing
       return null
     }
-    let reload = fn
     // manually set template and keep Vue instance unmounted
     const vm = new Vue({
       data,
       template,
-      methods: Object.assign({ fn, reload }, methods)
+      methods: Object.assign({ run, reload, set }, methods)
     })
 
     // do the renderization
