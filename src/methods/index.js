@@ -56,7 +56,8 @@ module.exports = methods
   'specValues',
   'specTextValue',
   'specValueByText',
-  'variationsGrids'
+  'variationsGrids',
+  'toggle'
 ].forEach(name => {
   addVueMethod(name, require('./def/' + name + '.js'))
 })
