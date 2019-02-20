@@ -81,29 +81,46 @@ const render = (store, el, body, load, args) => {
         }
       }
 
-      // create new Vue instance
-      new Vue({
-        mounted () {
-          let el = this.$el
-          if (el) {
-            if (!el.dataset.vm) {
-              // destroy Vue instace after element rendering
-              this.$destroy()
-              // mark element as rendered
-              el.classList.add('rendered')
-              return
-            }
-            // save Vue instance globally
-            window[el.dataset.vm] = this
-          }
-          resolve()
-        },
-
+      // setup Vue options
+      let vmOptions = {
         data,
         template,
-        methods: Object.assign({ reload }, methods),
-        destroyed: resolve
-      }).$mount(el)
+        methods: Object.assign({ reload }, methods)
+      }
+
+      if (el.dataset.vm) {
+        // keep instance alive
+        if (args) {
+          // observe args to reload body
+          vmOptions.watch = {
+            args: {
+              handler () {
+                this.reload()
+              },
+              deep: typeof args === 'object'
+            }
+          }
+        }
+
+        // resolve promise on instance mounted
+        vmOptions.mounted = function () {
+          // save Vue instance globally
+          window[el.dataset.vm] = this
+          resolve()
+        }
+      } else {
+        vmOptions.mounted = function () {
+          // destroy Vue instace after element rendering
+          this.$destroy()
+          // mark element as rendered
+          el.classList.add('rendered')
+        }
+        // resolve promise on instance destroyed
+        vmOptions.destroyed = resolve
+      }
+
+      // create new Vue instance
+      new Vue(vmOptions).$mount(el)
     } else {
       // NodeJS ?
       // handle server side rendering
