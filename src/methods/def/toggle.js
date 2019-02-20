@@ -20,8 +20,11 @@ const toggle = (list, str) => {
       // add element
       list.push(str)
     }
+    return list
+  } else {
+    // create new array with the string
+    return [ str ]
   }
-  return list
 }
 
 module.exports = toggle
