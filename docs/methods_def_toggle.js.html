@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: methods/def/specValues.js</title>
+    <title>JSDoc: Source: methods/def/toggle.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: methods/def/specValues.js</h1>
+    <h1 class="page-title">Source: methods/def/toggle.js</h1>
 
     
 
@@ -29,42 +29,30 @@
             <pre class="prettyprint source linenums"><code>'use strict'
 
 /**
- * Returns array of spec objects for specified grid.
+ * Add or remove an element from array of strings.
  * @memberOf Ecom.methods
- * @param {object|array} body - Product body or array of variation objects
- * @param {string} grid - Grid ID string such as 'color'
+ * @param {array} list - Array of strings
+ * @param {string} str - String to toggle on list
  * @returns {array}
  */
 
-const specValues = (body, grid) => {
-  var specValues = []
-  if (Array.isArray(body)) {
-    if (body.length) {
-      if (body[0].specifications) {
-        // variations array sent as body param
-        for (var i = 0; i &lt; body.length; i++) {
-          specValues = specValues.concat(specValues(body[i], grid))
-        }
-      } else if (body[0].text) {
-        // spec values list sent as body param
-        specValues = body
-      }
-    }
-  } else {
-    var specifications = body.specifications
-    if (specifications) {
-      for (var Grid in specifications) {
-        if (specifications.hasOwnProperty(Grid) &amp;&amp; Grid === grid) {
-          // specification found
-          specValues = specifications[grid]
-        }
-      }
+const toggle = (list, str) => {
+  if (Array.isArray(list)) {
+    let index = list.indexOf(str)
+    if (index > -1) {
+      // string found
+      // remove element from list
+      list.splice(index, 1)
+    } else {
+      // not found
+      // add element
+      list.push(str)
     }
   }
-  return specValues
+  return list
 }
 
-module.exports = specValues
+module.exports = toggle
 </code></pre>
         </article>
     </section>
