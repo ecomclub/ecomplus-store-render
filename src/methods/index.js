@@ -62,23 +62,10 @@ module.exports = methods
   addVueMethod(name, require('./def/' + name + '.js'))
 })
 
-// handle custom methods from window object on browser
+// additional methods for browser only
 if (typeof window === 'object') {
-  methods.fn = function (method, payload) {
-    // try to call global function
-    let fn = window[method]
-    if (typeof fn === 'function') {
-      return fn({
-        // pass body object from instance data
-        body: (this.$data && this.$data.body) || {},
-        // bypass received payload
-        payload
-      })
-    } else {
-      // debug
-      console.log('WARN: window.' + method + ' isn\'t a function', this.$el)
-    }
-    // returns null by default
-    return null
-  }
+  // handle custom methods from window object
+  methods.run = require('./handlers/run')
+  // handle args update for keep alive Vue instances
+  methods.set = require('./handlers/set')
 }
