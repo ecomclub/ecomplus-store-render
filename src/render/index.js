@@ -92,6 +92,7 @@ const render = (store, el, body, load, args) => {
         // keep instance alive
         if (args) {
           // observe args to reload body
+          args.updated = Date.now()
           vmOptions.watch = {
             args: {
               handler () {
