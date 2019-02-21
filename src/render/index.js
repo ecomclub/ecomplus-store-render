@@ -88,7 +88,8 @@ const render = (store, el, body, load, args) => {
         methods: Object.assign({ reload }, methods)
       }
 
-      if (el.dataset.vm) {
+      let instanceName = el.dataset.vm
+      if (instanceName) {
         // keep instance alive
         if (args) {
           // observe args to reload body
@@ -106,7 +107,7 @@ const render = (store, el, body, load, args) => {
         // resolve promise on instance mounted
         vmOptions.mounted = function () {
           // save Vue instance globally
-          window[el.dataset.vm] = this
+          window[instanceName] = this
           resolve()
         }
       } else {
@@ -114,7 +115,7 @@ const render = (store, el, body, load, args) => {
           // destroy Vue instace after element rendering
           this.$destroy()
           // mark element as rendered
-          el.classList.add('rendered')
+          this.$el.classList.add('rendered')
         }
         // resolve promise on instance destroyed
         vmOptions.destroyed = resolve
