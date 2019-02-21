@@ -68,9 +68,13 @@ const render = (store, el, body, load, args) => {
           let callback = (err, body) => {
             if (err) {
               console.error(err)
+              // trigger custom event with error object as payload
+              vm.$emit('reloadError', err)
             } else if (body) {
               // reactive update of instance data
               vm.body = body
+              // emit custom event
+              vm.$emit('reloadSuccess')
             }
           }
 
