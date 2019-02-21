@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: methods/def/specValueByText.js</title>
+    <title>JSDoc: Source: methods/handlers/run.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: methods/def/specValueByText.js</h1>
+    <h1 class="page-title">Source: methods/handlers/run.js</h1>
 
     
 
@@ -28,29 +28,30 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict'
 
-const specValues = require('./specValues')
-
 /**
- * Get value property of spec object based on respective text.
+ * Handle custom functions inside Vue instance from window object.
  * @memberOf Ecom.methods
- * @param {object|array} body - Product body or array of variation objects
- * @param {string} grid - Grid ID string such as 'color'
- * @param {string} text - Spec object text property such as 'Blue'
- * @returns {string|undefined}
+ * @param {string} func - Name of the global function
+ * @param {mixed} [payload] - Payload passed to window[func]
  */
 
-const specValueByText = (body, grid, text) => {
-  let values = specValues(body, grid)
-  for (var i = 0; i &lt; values.length; i++) {
-    if (values[i].text === text) {
-      return values[i].value
-    }
+const run = function (func, payload) {
+  // try to call global function
+  let fn = window[func]
+  if (typeof fn === 'function') {
+    return fn({
+      // pass body object from instance data
+      body: this.body || {},
+      // bypass received payload
+      payload
+    })
+  } else {
+    // debug
+    console.log('WARN: window.' + func + ' isn\'t a function', this.$el)
   }
-  // any spec found for received grid and option text
-  return undefined
 }
 
-module.exports = specValueByText
+module.exports = run
 </code></pre>
         </article>
     </section>
