@@ -71,6 +71,20 @@
 
     <!-- Simple search engine -->
     <ul class="_ecom-el" v-bind:class="'rendered'" data-type="items" data-vm="Search" data-term="fifa">
+      <!-- Show search terms suggestions and history -->
+      <h5 v-if="payload.suggested">
+        Did you mean {{ payload.suggested }}?
+      </h5>
+      <h6 v-else-if="payload.suggested === ''">
+        No results for {{ args.term }}
+      </h6>
+      <div v-if="payload.history">
+        Search history:
+        <span v-for="term in payload.history">
+          {{ term }};
+        </span>
+      </div>
+
       <!-- Setup filters -->
       <div v-if="body.aggregations">
         <!-- Filtering by brands -->
