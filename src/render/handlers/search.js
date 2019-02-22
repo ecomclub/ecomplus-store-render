@@ -5,27 +5,78 @@ const EcomIo = require('ecomplus-sdk')
 // render specific element
 const render = require('./../')
 
+// handle persist search history data on browser
+// check localStorage browser support
+/* global localStorage */
+const DB_HISTORY = typeof localStorage === 'object' ? 'ecomSeachHistory' : null
+
 // reusable load body function
-const load = (searchCallback, args) => {
+const load = (callback, args, payload) => {
   // prevent search with empty term (no results)
   let term = args.term && args.term.trim()
   if (term === '') {
     term = null
   }
+  // reset suggested term
+  payload.suggested = null
 
-  // call Search API
-  EcomIo.searchProducts(
-    searchCallback,
-    term,
-    args.from,
-    args.size,
-    args.sort,
-    args.specs,
-    args.ids,
-    args.brands,
-    args.categories,
-    args.prices
-  )
+  let searchCallback = (err, body) => {
+    if (!err && term) {
+      if (body.hits.total > 0) {
+        if (payload.history) {
+          // add searched term to history list
+          if (payload.history.indexOf(args.term) === -1) {
+            payload.history.push(args.term)
+
+            // update browser localStorage data
+            if (DB_HISTORY) {
+              localStorage.setItem(DB_HISTORY, payload.history.join('||'))
+            }
+          }
+        }
+      } else if (payload.retry && body.suggest) {
+        // search with no results
+        // try with suggested fixed words
+        let retryTerm = term
+        body.suggest[Object.keys(body.suggest)[0]].forEach(word => {
+          if (word.options && word.options.length) {
+            retryTerm = retryTerm.replace(word.text, word.options[0].text)
+          }
+        })
+
+        if (retryTerm !== term) {
+          // try to search with new (fixed) term
+          search(retryTerm)
+          payload.suggested = retryTerm
+        } else {
+          // search without term filter
+          search()
+          payload.suggested = ''
+        }
+        return
+      }
+    }
+
+    // proceed to callback with search results
+    callback(err, body)
+  }
+
+  let search = term => {
+    // call Search API
+    EcomIo.searchProducts(
+      searchCallback,
+      term,
+      args.from,
+      args.size,
+      args.sort,
+      args.specs,
+      args.ids,
+      args.brands,
+      args.categories,
+      args.prices
+    )
+  }
+  search(term)
 }
 
 const searchItems = (store, el, presetBody) => {
@@ -82,6 +133,31 @@ const searchItems = (store, el, presetBody) => {
     }
   }
 
+  // booleans to config search engine
+  let retry, history
+  // defaults to true
+  retry = el.dataset.searchRetry !== 'false'
+
+  // handle searched terms history
+  if (el.dataset.searchHistory !== 'false') {
+    // try to get from saved history browser localStorage
+    if (DB_HISTORY) {
+      history = localStorage.getItem(DB_HISTORY)
+      if (typeof history === 'string') {
+        history = history.split('||')
+      }
+    }
+    if (!Array.isArray(history)) {
+      // new search history list
+      history = []
+    }
+  } else {
+    history = false
+  }
+
+  // setup additional payload for instance data
+  let payload = { retry, history }
+
   return new Promise(resolve => {
     let searchCallback = (err, body) => {
       if (!err) {
@@ -91,7 +167,7 @@ const searchItems = (store, el, presetBody) => {
           // merge with Search API response
           body = Object.assign(presetBody, body)
         }
-        render(store, el, body, load, args).then(resolve)
+        render(store, el, body, load, args, payload).then(resolve)
       } else {
         console.error(err)
         // resolve the promise anyway
@@ -99,7 +175,7 @@ const searchItems = (store, el, presetBody) => {
       }
     }
     // first body load
-    load(searchCallback, args)
+    load(searchCallback, args, payload)
   })
 }
 
