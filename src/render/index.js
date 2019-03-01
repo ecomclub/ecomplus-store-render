@@ -119,13 +119,13 @@ const render = (store, el, body, load, args, payload) => {
         vmOptions.mounted = function () {
           // destroy Vue instace after element rendering
           this.$destroy()
-          // mark element as rendered
-          this.$el.classList.add('rendered')
         }
         // resolve promise on instance destroyed
         vmOptions.destroyed = resolve
       }
 
+      // mark element as rendered with Vue
+      el.setAttribute('v-bind:class', '\'rendered\'')
       // create new Vue instance
       new Vue(vmOptions).$mount(el)
     } else {

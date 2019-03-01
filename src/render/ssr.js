@@ -12,6 +12,9 @@ const { document } = require('./../lib/dom')
 module.exports = (el, data) => {
   if (el && typeof require === 'function') {
     // NodeJS environment
+    // mark element as prerendered
+    el.setAttribute('v-bind:class', '\'prerendered\'')
+
     // save the original template on new script tag
     let template = el.outerHTML
     let script = document.createElement('script')
@@ -38,8 +41,6 @@ module.exports = (el, data) => {
     return renderer.renderToString(vm).then(html => {
       // save HTML on DOM
       el.outerHTML = html
-      // mark element as rendered
-      el.classList.add('rendered')
     }).catch(err => {
       console.error(err)
     })
