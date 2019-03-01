@@ -2,7 +2,7 @@
 
 [![CodeFactor](https://www.codefactor.io/repository/github/ecomclub/ecomplus-store-render/badge)](https://www.codefactor.io/repository/github/ecomclub/ecomplus-store-render)
 [![npm version](https://img.shields.io/npm/v/ecomplus-render.svg)](https://www.npmjs.org/ecomplus-render)
-[![license mit](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![license mit](https://img.shields.io/badge/License-Apache-orange.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Render E-Com Plus store templates with Vue.js 2.
 

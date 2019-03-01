@@ -1,6 +1,6 @@
 {
   "name": "@ecomplus/storefront-renderer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Vue.js app to render E-Com Plus store template",
   "main": "src/index.js",
   "scripts": {
@@ -24,7 +24,7 @@
     "ecommerce-framework"
   ],
   "author": "E-Com Club",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/ecomclub/ecomplus-store-render/issues"
   },
