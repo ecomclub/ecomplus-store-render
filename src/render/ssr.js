@@ -12,8 +12,8 @@ const { document } = require('./../lib/dom')
 module.exports = (el, data) => {
   if (el && typeof require === 'function') {
     // NodeJS environment
-    // mark element as prerendered
-    el.setAttribute('v-bind:class', '\'prerendered\'')
+    // mark element as pre rendered
+    el.setAttribute('v-bind:class', '\'pre-rendered\'')
 
     // save the original template on new script tag
     let template = el.outerHTML
