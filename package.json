@@ -1,6 +1,6 @@
 {
   "name": "@ecomplus/storefront-renderer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Vue.js app to render E-Com Plus store template",
   "main": "src/index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "doc": "jsdoc src -r README.md -d docs"
   },
   "bin": {
-    "storefront-render": "./src/cli.js"
+    "storefront-renderer": "./src/cli.js"
   },
   "repository": {
     "type": "git",
