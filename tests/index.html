@@ -22,6 +22,9 @@
         -webkit-animation: fadein 1s;
         -o-animation: fadein 1s;
       }
+      ._ecom-el.prerendered {
+        opacity: 1;
+      }
       @keyframes fadein {
         from {
           opacity: 0;
@@ -63,14 +66,14 @@
   <!-- Setup store IDs for renderer -->
   <body class="_ecom-store" data-store="1011" data-id="5b1abe30a4d4531b8fe40725">
     <!-- Simple store element -->
-    <div class="_ecom-el" v-bind:class="'rendered'" data-type="store">
+    <div class="_ecom-el" data-type="store">
       <a v-if="body.logo" href="#">
         <img v-bind:src="body.logo.url" v-bind:alt="body.logo.alt" v-on:click="run('log', [ 1, 2 ])">
       </a>
     </div>
 
     <!-- Simple search engine -->
-    <ul class="_ecom-el" v-bind:class="'rendered'" data-type="items" data-vm="Search" data-term="fifa">
+    <ul class="_ecom-el" data-type="items" data-vm="Search" data-term="fifa">
       <!-- Show search terms suggestions and history -->
       <h5 v-if="payload.suggested">
         Did you mean {{ payload.suggested }}?
