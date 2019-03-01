@@ -47,15 +47,17 @@ const render = (store, el, body, load, args, payload) => {
     }
   }
 
-  let template
+  let template, preRendered
   if (el.dataset.serverRendered) {
     // element already rendered server side
     // setup client side hydration
     let script = el.nextSibling
     if (script && script.tagName === 'SCRIPT') {
-      template = el.nextSibling.innerHTML
+      template = script.innerHTML
       // unset to prevent Vue warn
       delete el.dataset.serverRendered
+      // save pre rendered HTML to further check modifications
+      preRendered = el.outerHTML
     }
   }
 
@@ -92,6 +94,8 @@ const render = (store, el, body, load, args, payload) => {
         template,
         methods: Object.assign({ reload }, methods)
       }
+      // in some cases we should mount the instance on new element first
+      let elNew
 
       let instanceName = el.dataset.vm
       if (instanceName) {
@@ -116,18 +120,40 @@ const render = (store, el, body, load, args, payload) => {
           resolve()
         }
       } else {
+        if (preRendered) {
+          // mount the instance on new DOM element
+          // keeps original element intact with pre rendered content
+          elNew = document.createElement('div')
+        }
+
         vmOptions.mounted = function () {
           // destroy Vue instace after element rendering
           this.$destroy()
+
+          if (elNew && this.$el.outerHTML !== preRendered) {
+            // update original element content
+            // force element height to prevent resize effect
+            el.style.minHeight = el.offsetHeight + 'px'
+            setTimeout(() => {
+              el.style.minHeight = ''
+            }, 1500)
+            // content was modified
+            el.innerHTML = this.$el.innerHTML
+            // add rendered class to trigger animation
+            el.classList.add('rendered')
+          }
         }
+
         // resolve promise on instance destroyed
         vmOptions.destroyed = resolve
       }
 
-      // mark element as rendered with Vue
-      el.setAttribute('v-bind:class', '\'rendered\'')
+      if (!template) {
+        // mark element as rendered with Vue
+        el.setAttribute('v-bind:class', '\'rendered\'')
+      }
       // create new Vue instance
-      new Vue(vmOptions).$mount(el)
+      new Vue(vmOptions).$mount(elNew || el)
     } else {
       // NodeJS ?
       // handle server side rendering
