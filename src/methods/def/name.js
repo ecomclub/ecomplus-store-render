@@ -8,7 +8,7 @@
  * @returns {string}
  */
 
-const name = (body, lang) => {
+const name = function (body, lang) {
   if (!lang && typeof this === 'object' && this !== null && this.Store) {
     // this is the Vue instance
     // default store lang
