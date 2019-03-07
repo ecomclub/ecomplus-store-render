@@ -19,17 +19,12 @@ const grids = require('./../data/grids')
  */
 
 const render = (store, el, body, load, args, payload) => {
-  // pass store properties to instance data
-  if (store) {
-    body.Store = store
-  }
-
   if (typeof Ecom === 'object') {
     // on browser
     /* global Ecom */
     if (!store && Ecom.stores.length) {
       // use first recognized store
-      body.Store = Ecom.stores[0]
+      store = Ecom.stores[0]
     }
     if (!Ecom.hasOwnProperty('currentObject') && el.dataset.current === 'true') {
       // force as current object
@@ -37,8 +32,14 @@ const render = (store, el, body, load, args, payload) => {
     }
   }
 
+  if (!store) {
+    // empty store object ?
+    store = {}
+  }
   // setup instance data
-  let data = { body, args, payload }
+  // also pass store properties to instance data
+  let data = { body, args, payload, store }
+
   // get custom variables from data-payload
   if (el.dataset.hasOwnProperty('payload')) {
     try {
