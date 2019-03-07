@@ -25,7 +25,6 @@ const set = function (props, value, isArray = true) {
     if (obj[prop] === undefined) {
       // create new object
       obj[prop] = {}
-      console.log(prop)
     }
     obj = obj[prop]
   }
