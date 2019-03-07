@@ -9,10 +9,10 @@
  */
 
 const name = function (body, lang) {
-  if (!lang && typeof this === 'object' && this !== null && this.Store) {
+  if (!lang && typeof this === 'object' && this !== null && this.store) {
     // this is the Vue instance
     // default store lang
-    lang = this.Store.lang
+    lang = this.store.lang
   }
   // prefer translated item name
   if (lang && body.hasOwnProperty('i18n') && body.i18n.hasOwnProperty(lang)) {
