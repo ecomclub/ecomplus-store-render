@@ -26,7 +26,7 @@ const addVueMethod = (name, func) => {
 
       // call global method
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply
-      return func.apply(null, args)
+      return func.apply(this, args)
     }
   }())
 }
@@ -57,6 +57,7 @@ module.exports = methods
   'specTextValue',
   'specValueByText',
   'variationsGrids',
+  'gridTitle',
   'toggle',
   'includes'
 ].forEach(name => {
