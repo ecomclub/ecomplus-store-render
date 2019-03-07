@@ -4,8 +4,8 @@
 const Vue = require('vue')
 // Ecom methods for Vue instance
 const methods = require('./../methods/')
-// preload some reusable data
-const preload = require('./preload')
+// preload grids list
+const grids = require('./../data/grids')
 
 /**
  * Render specific DOM element.
@@ -37,6 +37,19 @@ const render = (store, el, body, load, args, payload) => {
     }
   }
 
+  // setup instance data
+  let data = { body, args, payload }
+  // get custom variables from data-payload
+  if (el.dataset.hasOwnProperty('payload')) {
+    try {
+      data.payload = JSON.parse(el.dataset.payload)
+    } catch (e) {
+      console.log('Ignoring invalid element payload:')
+      console.log(el)
+    }
+  }
+
+  // handle prerendered (SSR) content
   let template, preRendered
   if (el.dataset.serverRendered) {
     // element already rendered server side
@@ -52,26 +65,16 @@ const render = (store, el, body, load, args, payload) => {
   }
 
   return new Promise(resolve => {
-    // preload some data per store
-    preload(store.store_id).then(assets => {
-      // setup instance data
-      let data = { body, args, assets, payload }
-      // get custom variables from data-payload
-      if (el.dataset.hasOwnProperty('payload')) {
-        try {
-          data.payload = JSON.parse(el.dataset.payload)
-        } catch (e) {
-          console.log('Ignoring invalid element payload:')
-          console.log(el)
-        }
-      }
-
+    // preload grids data per store before creating Vue instance
+    grids(store.store_id).then(() => {
       if (typeof window === 'object' && window.document) {
         // on browser
         // setup reload method
         let reload = function () {
           if (typeof load === 'function') {
             let vm = this
+
+            // callback for SDK method
             let callback = (err, body) => {
               if (err) {
                 console.error(err)

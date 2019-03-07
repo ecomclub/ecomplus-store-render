@@ -19,8 +19,8 @@ module.exports = storeId => {
         }
 
         // resolve the promise anyway
-        // pass object with grids property (array)
-        resolve({ grids })
+        // returns grids array
+        resolve(grids)
       }
 
       // run custom request from SDK http client
