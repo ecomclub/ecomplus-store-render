@@ -109,12 +109,19 @@
         <div v-if="body.aggregations.specs && body.aggregations.specs.grid">
           <div v-for="grid in body.aggregations.specs.grid.buckets">
             <span v-if="grid.text">
-              <h5>{{ grid.key }}</h5>
+              <h5>{{ gridTitle(grid.key) }}</h5>
               <div v-for="spec in grid.text.buckets">
                 <input type="checkbox"
                   v-bind:checked="args.specs && includes(args.specs[grid.key], spec.key)"
                   v-on:change="set([ 'specs', grid.key ], spec.key)">
-                <label> {{ spec.key + ' (' + spec.doc_count + ')' }} </label>
+                <label v-if="grid.key === 'colors'">
+                  <span v-bind:style="{ color: specValueByText(null, 'colors', spec.key) }">
+                    {{ spec.key }}
+                  </span>
+                </label>
+                <label v-else>
+                  {{ spec.key }}
+                </label>
               </div>
             </span>
           </div>
