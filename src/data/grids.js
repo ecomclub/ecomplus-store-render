@@ -3,30 +3,40 @@
 // E-Com Plus storefront SDK
 const EcomIo = require('ecomplus-sdk')
 
-// save promises by Store ID
-const byStore = {}
+// save promises and grids by store ID
+const stores = {}
 
-module.exports = storeId => {
-  if (!byStore[storeId]) {
-    byStore[storeId] = new Promise(resolve => {
-      // get list of grids
-      let callback = (err, body) => {
-        let grids = []
-        if (err) {
-          console.error(err)
-        } else {
-          grids = body.result
+module.exports = (storeId, returnsObject) => {
+  if (!stores[storeId]) {
+    stores[storeId] = {
+      promise: new Promise(resolve => {
+        // get list of grids
+        let callback = (err, body) => {
+          let grids = []
+          if (err) {
+            console.error(err)
+          } else {
+            grids = body.result
+          }
+
+          // resolve the promise anyway
+          resolve(grids)
+          // save the grids array
+          stores[storeId].grids = grids
         }
 
-        // resolve the promise anyway
-        // returns grids array
-        resolve(grids)
-      }
-
-      // run custom request from SDK http client
-      let endpoint = '/grids.json'
-      EcomIo.http(callback, endpoint)
-    })
+        // run custom request from SDK http client
+        let endpoint = '/grids.json'
+        EcomIo.http(callback, endpoint)
+      })
+    }
   }
-  return byStore[storeId]
+
+  if (!returnsObject) {
+    // returns the promise by default
+    return stores[storeId].promise
+  } else {
+    // returns the respective grids array if any
+    return stores[storeId].grids
+  }
 }
