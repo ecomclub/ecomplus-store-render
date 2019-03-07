@@ -28,10 +28,12 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict'
 
-// VueJS 2
+// Vue.js 2
 const Vue = require('vue')
 // Ecom methods for Vue instance
 const methods = require('./../methods/')
+// preload grids list
+const grids = require('./../data/grids')
 
 /**
  * Render specific DOM element.
@@ -45,17 +47,12 @@ const methods = require('./../methods/')
  */
 
 const render = (store, el, body, load, args, payload) => {
-  // pass store properties to instance data
-  if (store) {
-    body.Store = store
-  }
-
   if (typeof Ecom === 'object') {
     // on browser
     /* global Ecom */
     if (!store &amp;&amp; Ecom.stores.length) {
       // use first recognized store
-      body.Store = Ecom.stores[0]
+      store = Ecom.stores[0]
     }
     if (!Ecom.hasOwnProperty('currentObject') &amp;&amp; el.dataset.current === 'true') {
       // force as current object
@@ -63,8 +60,14 @@ const render = (store, el, body, load, args, payload) => {
     }
   }
 
-  // handle element data
-  let data = { body, args, payload }
+  if (!store) {
+    // empty store object ?
+    store = {}
+  }
+  // setup instance data
+  // also pass store properties to instance data
+  let data = { body, args, payload, store }
+
   // get custom variables from data-payload
   if (el.dataset.hasOwnProperty('payload')) {
     try {
@@ -75,6 +78,7 @@ const render = (store, el, body, load, args, payload) => {
     }
   }
 
+  // handle prerendered (SSR) content
   let template, preRendered
   if (el.dataset.serverRendered) {
     // element already rendered server side
@@ -90,103 +94,108 @@ const render = (store, el, body, load, args, payload) => {
   }
 
   return new Promise(resolve => {
-    if (typeof window === 'object' &amp;&amp; window.document) {
-      // on browser
-      // setup reload method
-      let reload = function () {
-        if (typeof load === 'function') {
-          let vm = this
-          let callback = (err, body) => {
-            if (err) {
-              console.error(err)
-              // trigger custom event with error object as payload
-              vm.$emit('reloadError', err)
-            } else if (body) {
-              // reactive update of instance data
-              vm.body = body
-              // emit custom event
-              vm.$emit('reloadSuccess')
+    // preload grids data per store before creating Vue instance
+    grids(store.store_id).then(() => {
+      if (typeof window === 'object' &amp;&amp; window.document) {
+        // on browser
+        // setup reload method
+        let reload = function () {
+          if (typeof load === 'function') {
+            let vm = this
+
+            // callback for SDK method
+            let callback = (err, body) => {
+              if (err) {
+                console.error(err)
+                // trigger custom event with error object as payload
+                vm.$emit('reloadError', err)
+              } else if (body) {
+                // reactive update of instance data
+                vm.body = body
+                // emit custom event
+                vm.$emit('reloadSuccess')
+              }
+            }
+
+            // run load function with args from instance data
+            load(callback, vm.args, vm.payload)
+          } else {
+            console.log('WARN: no load function', this.$el)
+          }
+        }
+
+        // setup Vue options
+        let vmOptions = {
+          data,
+          template,
+          methods: Object.assign({ reload }, methods)
+        }
+        // in some cases we should mount the instance on new element first
+        let elNew
+
+        let instanceName = el.dataset.vm
+        if (instanceName) {
+          // keep instance alive
+          if (args) {
+            // observe args to reload body
+            args.updated = Date.now()
+            vmOptions.watch = {
+              args: {
+                handler () {
+                  this.reload()
+                },
+                deep: true
+              }
             }
           }
 
-          // run load function with args from instance data
-          load(callback, vm.args, vm.payload)
+          // resolve promise on instance mounted
+          vmOptions.mounted = function () {
+            // save Vue instance globally
+            window[instanceName] = this
+            resolve()
+          }
         } else {
-          console.log('WARN: no load function', this.$el)
-        }
-      }
+          if (preRendered) {
+            // mount the instance on new DOM element
+            // keeps original element intact with pre rendered content
+            elNew = document.createElement('div')
+          }
 
-      // setup Vue options
-      let vmOptions = {
-        data,
-        template,
-        methods: Object.assign({ reload }, methods)
-      }
-      // in some cases we should mount the instance on new element first
-      let elNew
+          vmOptions.mounted = function () {
+            // destroy Vue instace after element rendering
+            this.$destroy()
 
-      let instanceName = el.dataset.vm
-      if (instanceName) {
-        // keep instance alive
-        if (args) {
-          // observe args to reload body
-          args.updated = Date.now()
-          vmOptions.watch = {
-            args: {
-              handler () {
-                this.reload()
-              },
-              deep: true
+            if (elNew &amp;&amp; this.$el.outerHTML !== preRendered) {
+              // update original element content
+              // force element height to prevent resize effect
+              el.style.minHeight = el.offsetHeight + 'px'
+              setTimeout(() => {
+                el.style.minHeight = ''
+              }, 1500)
+              // content was modified
+              el.innerHTML = this.$el.innerHTML
+              // add rendered class to trigger animation
+              el.classList.add('rendered')
             }
           }
+
+          // resolve promise on instance destroyed
+          vmOptions.destroyed = resolve
         }
 
-        // resolve promise on instance mounted
-        vmOptions.mounted = function () {
-          // save Vue instance globally
-          window[instanceName] = this
-          resolve()
+        if (!template) {
+          // mark element as rendered with Vue
+          el.setAttribute('v-bind:class', '\'rendered\'')
         }
+        // create new Vue instance
+        new Vue(vmOptions).$mount(elNew || el)
       } else {
-        if (preRendered) {
-          // mount the instance on new DOM element
-          // keeps original element intact with pre rendered content
-          elNew = document.createElement('div')
-        }
-
-        vmOptions.mounted = function () {
-          // destroy Vue instace after element rendering
-          this.$destroy()
-
-          if (elNew &amp;&amp; this.$el.outerHTML !== preRendered) {
-            // update original element content
-            // force element height to prevent resize effect
-            el.style.minHeight = el.offsetHeight + 'px'
-            setTimeout(() => {
-              el.style.minHeight = ''
-            }, 1500)
-            // content was modified
-            el.innerHTML = this.$el.innerHTML
-            // add rendered class to trigger animation
-            el.classList.add('rendered')
-          }
-        }
-
-        // resolve promise on instance destroyed
-        vmOptions.destroyed = resolve
+        // NodeJS ?
+        // handle server side rendering
+        require('./ssr')(el, data).finally(resolve)
       }
-
-      if (!template) {
-        // mark element as rendered with Vue
-        el.setAttribute('v-bind:class', '\'rendered\'')
-      }
-      // create new Vue instance
-      new Vue(vmOptions).$mount(elNew || el)
-    } else {
-      // NodeJS ?
-      // handle server side rendering
-      require('./ssr')(el, data).finally(resolve)
-    }
+    })
   })
 }
 
@@ -207,7 +216,7 @@ module.exports = render
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Mar 01 2019 17:43:29 GMT-0300 (Brasilia Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 07 2019 17:32:19 GMT-0300 (Brasilia Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

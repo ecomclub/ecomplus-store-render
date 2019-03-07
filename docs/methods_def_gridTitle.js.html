@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: methods/def/findBySlug.js</title>
+    <title>JSDoc: Source: methods/def/gridTitle.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: methods/def/findBySlug.js</h1>
+    <h1 class="page-title">Source: methods/def/gridTitle.js</h1>
 
     
 
@@ -28,25 +28,42 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict'
 
-const findByProperty = require('./findByProperty')
+const name = require('./name')
+// try to get grids list from reusable data
+const gridsByStore = require('./../../data/grids')
 
 /**
- * Find object from list by slug value.
+ * Returns grid title by grid ID and lang.
  * @memberOf Ecom.methods
- * @param {array} list - List of nested objects
- * @param {string} slug - Object (category, brand...) slug value
- * @returns {object|undefined}
+ * @param {string} gridId - The unique ID of the grid ('colors', 'size'...)
+ * @param {string} [lang] - Language by code such as 'pt_br'
+ * @returns {string}
  */
 
-const findBySlug = (list, slug) => {
-  // must be an array
-  if (Array.isArray(list)) {
-    return findByProperty(list, 'slug', slug)
+const gridTitle = function (gridId, lang) {
+  let grid
+  if (typeof this === 'object' &amp;&amp; this !== null &amp;&amp; this.store) {
+    // this is the Vue instance
+    // get grids list of current store
+    const grids = gridsByStore(this.store.store_id, true)
+    if (grids) {
+      // match the grid by ID
+      grid = grids.find(grid => grid.grid_id === gridId)
+    }
   }
-  return undefined
+
+  if (grid) {
+    if (!lang) {
+      // default store lang
+      lang = this.store.lang
+    }
+    return name(grid, lang)
+  }
+  // returns the received grid ID by default
+  return gridId
 }
 
-module.exports = findBySlug
+module.exports = gridTitle
 </code></pre>
         </article>
     </section>

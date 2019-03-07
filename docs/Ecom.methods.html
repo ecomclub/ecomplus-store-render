@@ -1114,6 +1114,202 @@
     
 
     
+    <h4 class="name" id=".gridTitle"><span class="type-signature">(static) </span>gridTitle<span class="signature">(gridId, lang<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns grid title by grid ID and lang.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>gridId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The unique ID of the grid ('colors', 'size'...)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lang</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Language by code such as 'pt_br'</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="methods_def_gridTitle.js.html">methods/def/gridTitle.js</a>, <a href="methods_def_gridTitle.js.html#line15">line 15</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".height"><span class="type-signature">(static) </span>height<span class="signature">(imgBody)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
 
@@ -2657,7 +2853,7 @@
     
 
     
-    <h4 class="name" id=".specTextValue"><span class="type-signature">(static) </span>specTextValue<span class="signature">(body, grid, delimiter<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {string|null}</span></h4>
+    <h4 class="name" id=".specTextValue"><span class="type-signature">(static) </span>specTextValue<span class="signature">(body, gridId, delimiter<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {string|null}</span></h4>
     
 
     
@@ -2743,7 +2939,7 @@
 
         <tr>
             
-                <td class="name"><code>grid</code></td>
+                <td class="name"><code>gridId</code></td>
             
 
             <td class="type">
@@ -2906,7 +3102,7 @@
     
 
     
-    <h4 class="name" id=".specValueByText"><span class="type-signature">(static) </span>specValueByText<span class="signature">(body, grid, text)</span><span class="type-signature"> &rarr; {string|undefined}</span></h4>
+    <h4 class="name" id=".specValueByText"><span class="type-signature">(static) </span>specValueByText<span class="signature">(body, gridId, specText)</span><span class="type-signature"> &rarr; {string|undefined}</span></h4>
     
 
     
@@ -2976,7 +3172,7 @@
 
         <tr>
             
-                <td class="name"><code>grid</code></td>
+                <td class="name"><code>gridId</code></td>
             
 
             <td class="type">
@@ -2999,7 +3195,7 @@
 
         <tr>
             
-                <td class="name"><code>text</code></td>
+                <td class="name"><code>specText</code></td>
             
 
             <td class="type">
@@ -3111,7 +3307,7 @@
     
 
     
-    <h4 class="name" id=".specValues"><span class="type-signature">(static) </span>specValues<span class="signature">(body, grid)</span><span class="type-signature"> &rarr; {array}</span></h4>
+    <h4 class="name" id=".specValues"><span class="type-signature">(static) </span>specValues<span class="signature">(body, gridId)</span><span class="type-signature"> &rarr; {array}</span></h4>
     
 
     
@@ -3181,7 +3377,7 @@
 
         <tr>
             
-                <td class="name"><code>grid</code></td>
+                <td class="name"><code>gridId</code></td>
             
 
             <td class="type">
@@ -3238,7 +3434,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="methods_def_specValues.js.html">methods/def/specValues.js</a>, <a href="methods_def_specValues.js.html#line11">line 11</a>
+        <a href="methods_def_specValues.js.html">methods/def/specValues.js</a>, <a href="methods_def_specValues.js.html#line14">line 14</a>
     </li></ul></dd>
     
 
@@ -4036,7 +4232,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Mar 01 2019 17:43:29 GMT-0300 (Brasilia Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 07 2019 17:32:19 GMT-0300 (Brasilia Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
