@@ -6,6 +6,8 @@ const EcomIo = require('ecomplus-sdk')
 const dom = require('./../lib/dom')
 // utility fnctions
 const { getCookie, findChildsByClass } = require('./../lib/utils')
+// preload some reusable data
+const preload = require('./preload')
 // handle items search through Search API
 const searchItems = require('./handlers/search')
 // handle Graphs API and Store API by queue
@@ -44,6 +46,10 @@ module.exports = store => {
             store.lang = body.default_lang
           }
         }
+
+        // preload data by store ID
+        // handle preload concurrently with elements rendering
+        promises.push(preload(store.store_id))
 
         // render elements
         // https://developers.e-com.plus/ecomplus-store-template/#vue-instances

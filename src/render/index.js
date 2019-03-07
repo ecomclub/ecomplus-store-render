@@ -1,9 +1,11 @@
 'use strict'
 
-// VueJS 2
+// Vue.js 2
 const Vue = require('vue')
 // Ecom methods for Vue instance
 const methods = require('./../methods/')
+// preload some reusable data
+const preload = require('./preload')
 
 /**
  * Render specific DOM element.
@@ -35,18 +37,6 @@ const render = (store, el, body, load, args, payload) => {
     }
   }
 
-  // handle element data
-  let data = { body, args, payload }
-  // get custom variables from data-payload
-  if (el.dataset.hasOwnProperty('payload')) {
-    try {
-      data.payload = JSON.parse(el.dataset.payload)
-    } catch (e) {
-      console.log('Ignoring invalid element payload:')
-      console.log(el)
-    }
-  }
-
   let template, preRendered
   if (el.dataset.serverRendered) {
     // element already rendered server side
@@ -62,103 +52,118 @@ const render = (store, el, body, load, args, payload) => {
   }
 
   return new Promise(resolve => {
-    if (typeof window === 'object' && window.document) {
-      // on browser
-      // setup reload method
-      let reload = function () {
-        if (typeof load === 'function') {
-          let vm = this
-          let callback = (err, body) => {
-            if (err) {
-              console.error(err)
-              // trigger custom event with error object as payload
-              vm.$emit('reloadError', err)
-            } else if (body) {
-              // reactive update of instance data
-              vm.body = body
-              // emit custom event
-              vm.$emit('reloadSuccess')
+    // preload some data per store
+    preload(store.store_id).then(assets => {
+      // setup instance data
+      let data = { body, args, assets, payload }
+      // get custom variables from data-payload
+      if (el.dataset.hasOwnProperty('payload')) {
+        try {
+          data.payload = JSON.parse(el.dataset.payload)
+        } catch (e) {
+          console.log('Ignoring invalid element payload:')
+          console.log(el)
+        }
+      }
+
+      if (typeof window === 'object' && window.document) {
+        // on browser
+        // setup reload method
+        let reload = function () {
+          if (typeof load === 'function') {
+            let vm = this
+            let callback = (err, body) => {
+              if (err) {
+                console.error(err)
+                // trigger custom event with error object as payload
+                vm.$emit('reloadError', err)
+              } else if (body) {
+                // reactive update of instance data
+                vm.body = body
+                // emit custom event
+                vm.$emit('reloadSuccess')
+              }
+            }
+
+            // run load function with args from instance data
+            load(callback, vm.args, vm.payload)
+          } else {
+            console.log('WARN: no load function', this.$el)
+          }
+        }
+
+        // setup Vue options
+        let vmOptions = {
+          data,
+          template,
+          methods: Object.assign({ reload }, methods)
+        }
+        // in some cases we should mount the instance on new element first
+        let elNew
+
+        let instanceName = el.dataset.vm
+        if (instanceName) {
+          // keep instance alive
+          if (args) {
+            // observe args to reload body
+            args.updated = Date.now()
+            vmOptions.watch = {
+              args: {
+                handler () {
+                  this.reload()
+                },
+                deep: true
+              }
             }
           }
 
-          // run load function with args from instance data
-          load(callback, vm.args, vm.payload)
+          // resolve promise on instance mounted
+          vmOptions.mounted = function () {
+            // save Vue instance globally
+            window[instanceName] = this
+            resolve()
+          }
         } else {
-          console.log('WARN: no load function', this.$el)
-        }
-      }
+          if (preRendered) {
+            // mount the instance on new DOM element
+            // keeps original element intact with pre rendered content
+            elNew = document.createElement('div')
+          }
 
-      // setup Vue options
-      let vmOptions = {
-        data,
-        template,
-        methods: Object.assign({ reload }, methods)
-      }
-      // in some cases we should mount the instance on new element first
-      let elNew
+          vmOptions.mounted = function () {
+            // destroy Vue instace after element rendering
+            this.$destroy()
 
-      let instanceName = el.dataset.vm
-      if (instanceName) {
-        // keep instance alive
-        if (args) {
-          // observe args to reload body
-          args.updated = Date.now()
-          vmOptions.watch = {
-            args: {
-              handler () {
-                this.reload()
-              },
-              deep: true
+            if (elNew && this.$el.outerHTML !== preRendered) {
+              // update original element content
+              // force element height to prevent resize effect
+              el.style.minHeight = el.offsetHeight + 'px'
+              setTimeout(() => {
+                el.style.minHeight = ''
+              }, 1500)
+              // content was modified
+              el.innerHTML = this.$el.innerHTML
+              // add rendered class to trigger animation
+              el.classList.add('rendered')
             }
           }
+
+          // resolve promise on instance destroyed
+          vmOptions.destroyed = resolve
         }
 
-        // resolve promise on instance mounted
-        vmOptions.mounted = function () {
-          // save Vue instance globally
-          window[instanceName] = this
-          resolve()
+        if (!template) {
+          // mark element as rendered with Vue
+          el.setAttribute('v-bind:class', '\'rendered\'')
         }
+        // create new Vue instance
+        new Vue(vmOptions).$mount(elNew || el)
       } else {
-        if (preRendered) {
-          // mount the instance on new DOM element
-          // keeps original element intact with pre rendered content
-          elNew = document.createElement('div')
-        }
-
-        vmOptions.mounted = function () {
-          // destroy Vue instace after element rendering
-          this.$destroy()
-
-          if (elNew && this.$el.outerHTML !== preRendered) {
-            // update original element content
-            // force element height to prevent resize effect
-            el.style.minHeight = el.offsetHeight + 'px'
-            setTimeout(() => {
-              el.style.minHeight = ''
-            }, 1500)
-            // content was modified
-            el.innerHTML = this.$el.innerHTML
-            // add rendered class to trigger animation
-            el.classList.add('rendered')
-          }
-        }
-
-        // resolve promise on instance destroyed
-        vmOptions.destroyed = resolve
+        // NodeJS ?
+        // handle server side rendering
+        require('./ssr')(el, data).finally(resolve)
       }
-
-      if (!template) {
-        // mark element as rendered with Vue
-        el.setAttribute('v-bind:class', '\'rendered\'')
-      }
-      // create new Vue instance
-      new Vue(vmOptions).$mount(elNew || el)
-    } else {
-      // NodeJS ?
-      // handle server side rendering
-      require('./ssr')(el, data).finally(resolve)
-    }
+    })
   })
 }
 
