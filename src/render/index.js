@@ -38,7 +38,15 @@ const render = (store, el, body, load, args, payload) => {
   }
   // setup instance data
   // also pass store properties to instance data
-  let data = { body, args, payload, store }
+  let data = {
+    body,
+    args,
+    payload,
+    store,
+    // plugin configurations setted by Storefront Loader:
+    // https://github.com/ecomclub/storefront-loader
+    config: el.dataset.config || {}
+  }
 
   // get custom variables from data-payload
   if (el.dataset.hasOwnProperty('payload')) {
