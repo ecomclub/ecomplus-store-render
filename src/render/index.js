@@ -43,7 +43,7 @@ const render = (store, el, body, load, args, payload) => {
     args,
     payload,
     store,
-    // plugin configurations setted by Storefront Loader:
+    // widgets configurations setted by Storefront Loader:
     // https://github.com/ecomclub/storefront-loader
     config: el.dataset.config || {}
   }
