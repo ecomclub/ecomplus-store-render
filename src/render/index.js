@@ -15,7 +15,7 @@ const grids = require('./../data/grids')
  * @param {object} body - Body object to compose Vue instance data
  * @param {function} [load] - Load function to update body on instance data
  * @param {object} [args] - Compose data and work as filters to reload
- * @param {mixed} [payload] - Additional payload to instance data
+ * @param {object} [payload] - Additional payload to instance data
  */
 
 const render = (store, el, body, load, args, payload) => {
@@ -43,20 +43,29 @@ const render = (store, el, body, load, args, payload) => {
     args,
     payload,
     store,
-    // widgets configurations setted by Storefront Loader:
-    // https://github.com/ecomclub/storefront-loader
-    config: el.dataset.config || {}
+    // widgets configurations setted by Storefront Loader
+    // declare empty object first
+    config: {}
   }
 
-  // get custom variables from data-payload
-  if (el.dataset.hasOwnProperty('payload')) {
-    try {
-      data.payload = JSON.parse(el.dataset.payload)
-    } catch (e) {
-      console.log('Ignoring invalid element payload:')
+  // custom variables from data-payload and widget configuration from data-config
+  ;[ 'payload', 'config' ].forEach(label => {
+    if (el.dataset.hasOwnProperty(label)) {
+      try {
+        let obj = JSON.parse(el.dataset[label])
+        // ensure it is an object
+        if (typeof obj === 'object' && obj !== null && !Array.isArray(obj)) {
+          // override on instance data
+          data[label] = obj
+          return
+        }
+      } catch (e) {
+        // continue
+      }
+      console.log('Ignoring invalid element ' + label + ':')
       console.log(el)
     }
-  }
+  })
 
   // handle prerendered (SSR) content
   let template, preRendered
