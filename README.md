@@ -60,7 +60,7 @@ storefront-renderer https://mystore.com/product > product.html
 
 ```javascript
 require('@ecomplus/storefront-renderer')(html).then(({ dom, Ecom }) => {
-  Ecom.init().then(dom => {
+  Ecom.init().then(() => {
     // jsdom object
     console.log(dom.serialize())
   })
