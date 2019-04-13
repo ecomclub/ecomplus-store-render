@@ -2,8 +2,6 @@
 
 // Vue.js 2
 const Vue = require('vue')
-// Ecom object with render methods and current document
-const Ecom = require('./../ecom')
 // Ecom methods for Vue instance
 const methods = require('./../methods/')
 // preload grids list
@@ -23,13 +21,19 @@ const { document, location } = require('./../lib/dom')
  */
 
 const render = (store, el, body, load, args, payload) => {
-  if (!store && Ecom.stores.length) {
-    // use first recognized store
-    store = Ecom.stores[0]
-  }
-  if (!Ecom.hasOwnProperty('currentObject') && el.dataset.current === 'true') {
-    // force as current object
-    Ecom.currentObject = body
+  // check if element is marked as current
+  let isCurrent = el.dataset.current === 'true' || el.dataset.current === true
+  if (typeof Ecom === 'object') {
+    // on browser
+    /* global Ecom */
+    if (!store && Ecom.stores.length) {
+      // use first recognized store
+      store = Ecom.stores[0]
+    }
+    if (!Ecom.hasOwnProperty('currentObject') && isCurrent) {
+      // force as current object
+      Ecom.currentObject = body
+    }
   }
 
   if (!store) {
@@ -186,17 +190,17 @@ const render = (store, el, body, load, args, payload) => {
       }
     })
 
-    if (location && Ecom.currentObject && location.pathname === '/' + Ecom.currentObject.slug) {
+    if (location && isCurrent && location.pathname === '/' + body.slug) {
       // set page metadata using current object body
-      if (Ecom.currentObject.meta_title) {
+      if (body.meta_title) {
         // title tag
-        document.title = Ecom.currentObject.meta_title
+        document.title = body.meta_title
       }
-      if (Ecom.currentObject.meta_description) {
+      if (body.meta_description) {
         // meta description tag
         var elMeta = document.querySelector('meta[name="description"]')
         if (elMeta) {
-          elMeta.setAttribute('content', Ecom.currentObject.meta_description)
+          elMeta.setAttribute('content', body.meta_description)
         }
       }
     }
