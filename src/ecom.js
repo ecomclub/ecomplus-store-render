@@ -24,8 +24,10 @@ let stores = []
  */
 
 const init = (storeId, storeObjectId, lang) => {
-  // debug startup
-  console.log('Init E-Com Plus store rendering')
+  if (typeof window === 'object') {
+    // debug on browser
+    console.log('Init E-Com Plus store rendering')
+  }
   // reset stores array
   stores = []
 
