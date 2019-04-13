@@ -193,9 +193,14 @@ const render = (store, el, body, load, args, payload) => {
     if (location && isCurrent && location.pathname === '/' + body.slug) {
       // set page metadata using current object body
       // title tag
-      document.title = body.meta_title || body.name || document.title
+      if (body.meta_title) {
+        document.title = body.meta_title
+      } else if (body.name) {
+        document.title = body.name
+      }
+
+      // meta description tag
       if (body.meta_description) {
-        // meta description tag
         var elMeta = document.querySelector('meta[name="description"]')
         if (elMeta) {
           elMeta.setAttribute('content', body.meta_description)
