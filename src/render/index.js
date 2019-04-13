@@ -6,6 +6,8 @@ const Vue = require('vue')
 const methods = require('./../methods/')
 // preload grids list
 const grids = require('./../data/grids')
+// get document and location objects
+const { document, location } = require('./../lib/dom')
 
 /**
  * Render specific DOM element.
@@ -43,7 +45,7 @@ const render = (store, el, body, load, args, payload) => {
     args,
     payload,
     store,
-    // widgets configurations setted by Storefront Loader
+    // widgets configurations
     // declare empty object first
     config: {}
   }
@@ -185,6 +187,21 @@ const render = (store, el, body, load, args, payload) => {
         require('./ssr')(el, data).finally(resolve)
       }
     })
+
+    if (location && Ecom.currentObject && location.pathname === '/' + Ecom.currentObject.slug) {
+      // set page metadata using current object body
+      if (Ecom.currentObject.meta_title) {
+        // title tag
+        document.title = Ecom.currentObject.meta_title
+      }
+      if (Ecom.currentObject.meta_description) {
+        // meta description tag
+        var elMeta = document.querySelector('meta[name="description"]')
+        if (elMeta) {
+          elMeta.setAttribute('content', Ecom.currentObject.meta_description)
+        }
+      }
+    }
   })
 }
 
