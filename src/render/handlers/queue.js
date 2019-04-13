@@ -6,6 +6,8 @@ const EcomIo = require('ecomplus-sdk')
 const render = require('./../')
 // handle items search through Search API
 const searchItems = require('./search')
+// get location object
+const { location } = require('./../lib/dom')
 
 exports.add = (queue, el, resource, resourceId, listAll, currentId, graphsApi) => {
   let index
@@ -115,6 +117,21 @@ exports.run = (store, queue, currentObj) => {
           }
         }
 
+        let invalidElement = msg => {
+          if (typeof process === 'object') {
+            // Node.js
+            if (location && location.pathname) {
+              msg += ' ' + location.pathname
+            }
+          } else {
+            // browser
+            console.log(get.els)
+          }
+          console.error(new Error(msg))
+          // resolve the promise anyway
+          resolve()
+        }
+
         if (!graphsApi) {
           // default to Store API
           if (!get.list) {
@@ -125,8 +142,7 @@ exports.run = (store, queue, currentObj) => {
               // current URI resource object
               EcomIo.getById(callback, resource, currentObj._id)
             } else {
-              console.log('Ignored elements, id undefined and unmatched URI:')
-              console.log(get.els)
+              invalidElement('Ignored elements, id undefined and unmatched URI:')
             }
           } else {
             // list all resource objects
@@ -136,8 +152,7 @@ exports.run = (store, queue, currentObj) => {
             if (EcomIo.hasOwnProperty(ioMethod)) {
               EcomIo[ioMethod](callback)
             } else {
-              console.log('Ignored elements, list all unavailable:')
-              console.log(get.els)
+              invalidElement('Ignored elements, list all unavailable:')
             }
           }
         } else {
@@ -152,8 +167,7 @@ exports.run = (store, queue, currentObj) => {
             // current URI product object
             EcomIo[ioMethod](callback, currentObj._id)
           } else {
-            console.log('Ignored elements, product id undefined for Graphs method:')
-            console.log(get.els)
+            invalidElement('Ignored elements, product id undefined for Graphs method:')
           }
         }
       }))
