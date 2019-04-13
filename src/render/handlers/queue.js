@@ -7,7 +7,7 @@ const render = require('./../')
 // handle items search through Search API
 const searchItems = require('./search')
 // get location object
-const { location } = require('./../lib/dom')
+const { location } = require('./../../lib/dom')
 
 exports.add = (queue, el, resource, resourceId, listAll, currentId, graphsApi) => {
   let index
