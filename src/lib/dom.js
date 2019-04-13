@@ -2,7 +2,7 @@
 
 /**
  * Setup DOM object with document property.
- * Should receive only one of possible params.
+ * Should at least only one of possible params.
  * @namespace
  * @type {function}
  * @param {string} [html] - HTML string to render
@@ -24,7 +24,12 @@ const DOM = (html, url, file, dom) => {
       const { JSDOM } = jsdom
 
       if (html) {
-        resolve(new JSDOM(html))
+        let options
+        if (url) {
+          // url sets the value returned by window.location
+          options = { url }
+        }
+        resolve(new JSDOM(html, options))
       } else {
         // get DOM from web link or local HTML file
         (url ? JSDOM.fromURL(url) : JSDOM.fromFile(file)).then(resolve)
