@@ -13,7 +13,7 @@ const methods = require('./methods/')
  * @type {array}
  */
 
-const stores = []
+let stores = []
 
 /**
  * Render entire document.
@@ -24,10 +24,10 @@ const stores = []
  */
 
 const init = (storeId, storeObjectId, lang) => {
-  if (typeof window === 'object') {
-    // debug on browser
-    console.log('Init E-Com Plus store rendering')
-  }
+  // debug startup
+  console.log('Init E-Com Plus store rendering')
+  // reset stores array
+  stores = []
 
   // get document object
   const { document } = require('./lib/dom')
