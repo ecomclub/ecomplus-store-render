@@ -144,13 +144,21 @@ module.exports = store => {
 
           if (!currentObj.resource || !currentObj._id) {
             // get resource ID by current URI
-            EcomIo.mapByWindowUri(function (err, body) {
+            let mapCallback = (err, body) => {
               if (!err) {
                 promises.push(handleQueue.run(store, queue, body))
               } else {
                 console.error(err)
               }
-            })
+            }
+
+            if (dom.location) {
+              // remove the first / char from pathname
+              let slug = dom.location.pathname.slice(1)
+              EcomIo.mapBySlug(mapCallback, slug)
+            } else {
+              EcomIo.mapByWindowUri(mapCallback)
+            }
           } else {
             // current object already setted
             promises.push(handleQueue.run(store, queue, currentObj))
