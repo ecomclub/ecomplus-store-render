@@ -123,11 +123,12 @@ exports.run = (store, queue, currentObj) => {
             if (location && location.pathname) {
               msg += ' ' + location.pathname
             }
+            console.log(msg)
           } else {
             // browser
+            console.log(msg)
             console.log(get.els)
           }
-          console.error(new Error(msg))
           // resolve the promise anyway
           resolve()
         }
