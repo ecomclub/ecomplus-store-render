@@ -6,8 +6,6 @@ const EcomIo = require('ecomplus-sdk')
 const render = require('./../')
 // handle items search through Search API
 const searchItems = require('./search')
-// get location object
-const { location } = require('./../../lib/dom')
 
 exports.add = (queue, el, resource, resourceId, listAll, currentId, graphsApi) => {
   let index
@@ -47,6 +45,8 @@ exports.add = (queue, el, resource, resourceId, listAll, currentId, graphsApi) =
 }
 
 exports.run = (store, queue, currentObj) => {
+  // get location object
+  const { location } = require('./../../lib/dom')
   // one promise for each queue object
   let promises = []
 

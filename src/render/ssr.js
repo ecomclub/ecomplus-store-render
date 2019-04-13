@@ -6,12 +6,13 @@ const Vue = require('vue')
 const renderer = require('vue-server-renderer').createRenderer()
 // Ecom methods for Vue instance
 const methods = require('./../methods/')
-// get document object
-const { document } = require('./../lib/dom')
 
 module.exports = (el, data) => {
   if (el && typeof require === 'function') {
-    // NodeJS environment
+    // Node.js environment
+    // get document object
+    const { document } = require('./../lib/dom')
+
     // mark element as pre rendered
     el.setAttribute('v-bind:class', '\'pre-rendered\'')
 

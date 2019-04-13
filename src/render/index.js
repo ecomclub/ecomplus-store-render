@@ -6,8 +6,6 @@ const Vue = require('vue')
 const methods = require('./../methods/')
 // preload grids list
 const grids = require('./../data/grids')
-// get document and location objects
-const { document, location } = require('./../lib/dom')
 
 /**
  * Render specific DOM element.
@@ -21,8 +19,11 @@ const { document, location } = require('./../lib/dom')
  */
 
 const render = (store, el, body, load, args, payload) => {
+  // get document and location objects
+  const { document, location } = require('./../lib/dom')
   // check if element is marked as current
-  let isCurrent = el.dataset.current === 'true' || el.dataset.current === true
+  const isCurrent = el.dataset.current === 'true' || el.dataset.current === true
+
   if (typeof Ecom === 'object') {
     // on browser
     /* global Ecom */
