@@ -2,6 +2,8 @@
 
 // Vue.js 2
 const Vue = require('vue')
+// Ecom object with render methods and current document
+const Ecom = require('./../ecom')
 // Ecom methods for Vue instance
 const methods = require('./../methods/')
 // preload grids list
@@ -21,17 +23,13 @@ const { document, location } = require('./../lib/dom')
  */
 
 const render = (store, el, body, load, args, payload) => {
-  if (typeof Ecom === 'object') {
-    // on browser
-    /* global Ecom */
-    if (!store && Ecom.stores.length) {
-      // use first recognized store
-      store = Ecom.stores[0]
-    }
-    if (!Ecom.hasOwnProperty('currentObject') && el.dataset.current === 'true') {
-      // force as current object
-      Ecom.currentObject = body
-    }
+  if (!store && Ecom.stores.length) {
+    // use first recognized store
+    store = Ecom.stores[0]
+  }
+  if (!Ecom.hasOwnProperty('currentObject') && el.dataset.current === 'true') {
+    // force as current object
+    Ecom.currentObject = body
   }
 
   if (!store) {
