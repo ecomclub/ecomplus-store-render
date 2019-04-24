@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: methods/def/splitCategoryTree.js</title>
+    <title>JSDoc: Source: methods/def/searchedItems.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: methods/def/splitCategoryTree.js</h1>
+    <h1 class="page-title">Source: methods/def/searchedItems.js</h1>
 
     
 
@@ -29,33 +29,33 @@
             <pre class="prettyprint source linenums"><code>'use strict'
 
 /**
- * Parse category tree string to array.
+ * Returns array of items (products) from Search API response.
  * @memberOf Ecom.methods
- * @param {object|string} body - Product object body or category tree string
+ * @param {object|array} body - Search response body or ELS hits array
  * @returns {array}
  */
 
-const splitCategoryTree = body => {
-  let categories = []
-  let categoryTree
-  if (typeof body === 'string') {
-    // category tree string already sent as body param
-    categoryTree = body
-  } else {
-    categoryTree = body.category_tree
-  }
-  if (categoryTree) {
-    categories = categoryTree.split('>')
-    for (let i = 0; i &lt; categories.length; i++) {
-      // remove white spaces from names
-      categories[i] = categories[i].trim()
+const searchedItems = body => {
+  let hits
+  if (typeof body === 'object' &amp;&amp; body !== null) {
+    if (Array.isArray(body)) {
+      hits = body
+    } else if (body.hits) {
+      // ELS response body
+      hits = body.hits.hits || body.hits
     }
   }
-  // return array of categories
-  return categories
+  let items = []
+  if (Array.isArray(hits)) {
+    // map items array from ELS hits list
+    hits.forEach(({ _id, _source }) => {
+      items.push(Object.assign({}, _source, { _id }))
+    })
+  }
+  return items
 }
 
-module.exports = splitCategoryTree
+module.exports = searchedItems
 </code></pre>
         </article>
     </section>
