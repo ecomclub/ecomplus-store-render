@@ -58,6 +58,7 @@ module.exports = methods
   'specValueByText',
   'variationsGrids',
   'gridTitle',
+  'searchedItems',
   'toggle',
   'includes'
 ].forEach(name => {
