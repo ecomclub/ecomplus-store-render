@@ -17,7 +17,7 @@ Render E-Com Plus store templates with Vue.js 2.
 Include minified bundle via CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@ecomplus/storefront-renderer@0/dist/storefront.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ecomplus/storefront-renderer@1/dist/storefront.min.js"></script>
 ```
 
 ### Standalone
@@ -27,7 +27,7 @@ You can include the render standalone, it **requires** global `EcomIo` object fr
 [Vue](https://vuejs.org/v2/guide/#Getting-Started):
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@ecomplus/storefront-renderer@0/dist/render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ecomplus/storefront-renderer@1/dist/render.min.js"></script>
 ```
 
 ### With bundlers
