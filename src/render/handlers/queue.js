@@ -87,8 +87,8 @@ exports.run = (store, queue, currentObj) => {
 
                 // set data-ids
                 if (Array.isArray(ids)) {
-                  // implode array with separator ,
-                  el.dataset.ids = ids.join()
+                  // implode array with double bars separator (or)
+                  el.dataset.ids = ids.join('||')
                 } else if (typeof ids === 'string') {
                   // expect that the string already is a valid product object ID
                   el.dataset.ids = ids
