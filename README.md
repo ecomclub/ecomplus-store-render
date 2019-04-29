@@ -38,6 +38,10 @@ you can also include the
 
 `npm install --save @ecomplus/storefront-renderer`
 
+```js
+import '@ecomplus/storefront-renderer/dist/storefront.min.js'
+```
+
 ## Server side rendering
 
 The package is also compatible with NodeJS backend,
