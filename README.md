@@ -33,10 +33,14 @@ You can include the render standalone, it **requires** global `EcomIo` object fr
 ### With bundlers
 
 If using `webpack` or `browserify` (or relateds),
-you can also include the
+you can also install the
 [npm package](https://www.npmjs.com/package/@ecomplus/storefront-renderer):
 
-`npm install --save @ecomplus/storefront-renderer`
+```bash
+npm install --save @ecomplus/storefront-renderer
+```
+
+And import the bundle file:
 
 ```js
 import '@ecomplus/storefront-renderer/dist/storefront.min.js'
