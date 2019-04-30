@@ -1,6 +1,6 @@
 {
   "name": "@ecomplus/storefront-renderer",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Vue.js app to render E-Com Plus store template",
   "main": "src/index.js",
   "scripts": {
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ecomclub/ecomplus-store-render.git"
+    "url": "git+https://github.com/ecomclub/storefront-renderer.git"
   },
   "keywords": [
     "ecomplus",
@@ -26,9 +26,9 @@
   "author": "E-Com Club",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/ecomclub/ecomplus-store-render/issues"
+    "url": "https://github.com/ecomclub/storefront-renderer/issues"
   },
-  "homepage": "https://github.com/ecomclub/ecomplus-store-render#readme",
+  "homepage": "https://github.com/ecomclub/storefront-renderer#readme",
   "dependencies": {
     "@babel/polyfill": "^7.4.3",
     "@babel/runtime": "^7.4.3",
