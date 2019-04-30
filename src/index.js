@@ -1,5 +1,5 @@
 /**
- * https://github.com/ecomclub/ecomplus-store-render
+ * https://github.com/ecomclub/storefront-renderer
  * @author E-Com Club <ti@e-com.club>
  * @license MIT
  */
