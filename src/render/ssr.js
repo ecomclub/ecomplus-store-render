@@ -26,19 +26,24 @@ module.exports = (el, data) => {
 
     // mark element as pre rendered
     el.setAttribute('v-bind:class', '\'pre-rendered\'')
-    // instance template string
-    let template = el.outerHTML
-
     if (hydration) {
+      // SSR with runtime hydration
       // get document object
       const { document } = require('./../lib/dom')
+
       // save the original template on new script tag
       let script = document.createElement('script')
       script.setAttribute('type', 'text/x-template')
-      script.innerHTML = template
+      script.innerHTML = el.outerHTML
       // insert after the ._ecom-el element
       el.parentNode.insertBefore(script, el.nextSibling)
+    } else {
+      // no hydration
+      // disable runtime rendering when already prerendered
+      el.classList.remove('_ecom-el')
     }
+    // intance template string
+    let template = el.outerHTML
 
     // new Vue instance
     // assing additional methods (browser only) to prevent Vue error
