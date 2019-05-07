@@ -28,11 +28,8 @@ module.exports = (el, data) => {
     el.setAttribute('v-bind:class', '\'pre-rendered\'')
     if (hydration) {
       // SSR with runtime hydration
-      // get document object
-      const { document } = require('./../lib/dom')
-
       // save the original template on new script tag
-      let script = document.createElement('script')
+      let script = require('./../lib/dom').document.createElement('script')
       script.setAttribute('type', 'text/x-template')
       script.innerHTML = el.outerHTML
       // insert after the ._ecom-el element
