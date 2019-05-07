@@ -47,7 +47,7 @@ if (typeof window === 'object' && window.document) {
   let initPromise
   if (!dataset.ecomWait) {
     // start renderization automatically
-    initPromise = Ecom.init()
+    window.EcomInit = initPromise = Ecom.init()
   }
 
   if (typeof $ === 'function' && !dataset.ecomSkipJquery) {
