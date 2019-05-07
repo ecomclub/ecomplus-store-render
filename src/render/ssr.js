@@ -10,19 +10,35 @@ const methods = require('./../methods/')
 module.exports = (el, data) => {
   if (el && typeof require === 'function') {
     // Node.js environment
-    // get document object
-    const { document } = require('./../lib/dom')
+    // check SSR option on element data first
+    let hydration = true
+    switch (el.dataset.ssr) {
+      case undefined:
+        break
+      case 'no-hydration':
+        hydration = false
+        break
+      case 'disabled':
+        return Promise.resolve()
+      default:
+        break
+    }
 
     // mark element as pre rendered
     el.setAttribute('v-bind:class', '\'pre-rendered\'')
-
-    // save the original template on new script tag
+    // instance template string
     let template = el.outerHTML
-    let script = document.createElement('script')
-    script.setAttribute('type', 'text/x-template')
-    script.innerHTML = template
-    // insert after the ._ecom-el element
-    el.parentNode.insertBefore(script, el.nextSibling)
+
+    if (hydration) {
+      // get document object
+      const { document } = require('./../lib/dom')
+      // save the original template on new script tag
+      let script = document.createElement('script')
+      script.setAttribute('type', 'text/x-template')
+      script.innerHTML = template
+      // insert after the ._ecom-el element
+      el.parentNode.insertBefore(script, el.nextSibling)
+    }
 
     // new Vue instance
     // assing additional methods (browser only) to prevent Vue error
