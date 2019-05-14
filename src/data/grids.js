@@ -25,9 +25,9 @@ module.exports = (storeId, returnsObject) => {
           stores[storeId].grids = grids
         }
 
-        // run custom request from SDK http client
-        let endpoint = '/grids.json'
-        EcomIo.http(callback, endpoint)
+        // run custom request with generic SDK list method
+        let resource = 'grids'
+        EcomIo.getList(callback, resource)
       })
     }
   }
