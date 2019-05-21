@@ -5,7 +5,10 @@ const webpack = require('webpack')
 
 module.exports = {
   mode: 'development',
+  entry: './src/index.browser.js',
   output: {
+    library: 'StorefrontRenderer',
+    libraryTarget: 'umd',
     path: path.join(__dirname, 'dist'),
     filename: 'storefront.js'
   },

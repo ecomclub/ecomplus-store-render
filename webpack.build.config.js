@@ -2,12 +2,14 @@
 
 const webpack = require('webpack')
 const config = require('./webpack.config.js')
+const { output } = config
 
 // run builds for browser
 // Polyfill + Vue + SDK + Render
 const production = Object.assign(config, {
   mode: 'production',
   output: {
+    ...output,
     filename: 'storefront.min.js'
   },
   resolve: {
@@ -21,6 +23,7 @@ const production = Object.assign(config, {
 // build render standalone
 const standalone = Object.assign({}, production, {
   output: {
+    ...output,
     filename: 'render.min.js'
   },
   plugins: production.plugins.concat([
