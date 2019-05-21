@@ -9,7 +9,7 @@
 if (typeof window === 'object' && window.document) {
   // on browser
   // setup dependencies globally
-  let Vue
+  let Vue, EcomIo
   if (!window.Vue) {
     Vue = require('vue')
     window.Vue = Vue
@@ -17,7 +17,10 @@ if (typeof window === 'object' && window.document) {
     Vue = window.Vue
   }
   if (!window.EcomIo) {
-    window.EcomIo = require('ecomplus-sdk')
+    EcomIo = require('ecomplus-sdk')
+    window.EcomIo = EcomIo
+  } else {
+    EcomIo = window.EcomIo
   }
 
   // config global Vue constructor
@@ -43,18 +46,22 @@ if (typeof window === 'object' && window.document) {
 
   // automatic handlers for browser
   // check <body> data
-  let dataset = document.body.dataset
-  let initPromise
-  if (!dataset.ecomWait) {
+  let bodyConfig = document.body.dataset
+  let EcomInit
+  if (!bodyConfig.ecomWait) {
     // start renderization automatically
-    window.EcomInit = initPromise = Ecom.init()
+    window.EcomInit = EcomInit = Ecom.init()
+  }
+  if (typeof module !== 'undefined' && module.exports) {
+    // handle exports for Webpack and Browserify
+    module.exports = { Vue, Ecom, EcomIo, EcomInit }
   }
 
-  if (typeof $ === 'function' && !dataset.ecomSkipJquery) {
+  if (typeof $ === 'function' && !bodyConfig.ecomSkipJquery) {
     // delay jQuery ready event to improve compatibility
     /* global $ */
     $.holdReady(true)
-    initPromise.then(() => $.holdReady(false))
+    EcomInit.then(() => $.holdReady(false))
   }
 } else if (require.main !== module) {
   // NodeJS ?
