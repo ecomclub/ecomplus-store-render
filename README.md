@@ -20,6 +20,9 @@ Include minified bundle via CDN:
 <script src="https://cdn.jsdelivr.net/npm/@ecomplus/storefront-renderer@1/dist/storefront.min.js"></script>
 ```
 
+By default, it declares `Vue`, `Ecom`, `EcomIo` and `EcomInit`
+objects globally (on browser `window`).
+
 ### Standalone
 
 You can include the render standalone, it **requires** global `EcomIo` object from
@@ -44,6 +47,13 @@ And import the bundle file:
 
 ```js
 import '@ecomplus/storefront-renderer/dist/storefront.min.js'
+```
+
+You may also declare imported objects
+instead of using globals:
+
+```js
+import { Vue, Ecom, EcomIo, EcomInit } from '@ecomplus/storefront-renderer/dist/storefront.min.js'
 ```
 
 ## Server side rendering
