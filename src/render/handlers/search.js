@@ -12,6 +12,12 @@ const DB_HISTORY = typeof localStorage === 'object' ? 'ecomSeachHistory' : null
 
 // reusable load body function
 const load = (callback, args, payload) => {
+  if (args.ids && args.ids.length === 1 && args.ids[0] === '') {
+    // when collection or recommendation result has no products
+    // returns with empty callback
+    return callback()
+  }
+
   // prevent search with empty term (no results)
   let term = args.term && args.term.trim()
   if (term === '') {
@@ -160,19 +166,19 @@ const searchItems = (store, el, presetBody) => {
 
   return new Promise(resolve => {
     let searchCallback = (err, body) => {
-      if (!err) {
-        // console.log(body)
-        if (typeof presetBody === 'object' && presetBody !== null) {
-          // some Store API resource body
-          // merge with Search API response
-          body = Object.assign(presetBody, body)
+      if (!body) {
+        // mock empty ELS response
+        body = { hits: { total: 0, hits: [] } }
+        if (err) {
+          console.error(err)
         }
-        render(store, el, body, load, args, payload).then(resolve)
-      } else {
-        console.error(err)
-        // resolve the promise anyway
-        resolve()
       }
+      if (typeof presetBody === 'object' && presetBody !== null) {
+        // some Store API resource body
+        // merge with Search API response
+        body = Object.assign(presetBody, body)
+      }
+      render(store, el, body, load, args, payload).then(resolve)
     }
     // first body load
     load(searchCallback, args, payload)
