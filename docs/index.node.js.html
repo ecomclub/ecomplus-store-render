@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: methods/def/width.js</title>
+    <title>JSDoc: Source: index.node.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: methods/def/width.js</h1>
+    <h1 class="page-title">Source: index.node.js</h1>
 
     
 
@@ -26,20 +26,40 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>'use strict'
-
-const splitImgSize = require('./../aux/splitImgSize')
-
-/**
- * Returns width (px) of image object.
- * @memberOf Ecom.methods
- * @param {object} imgBody - Image object body
- * @returns {string}
+            <pre class="prettyprint source linenums"><code>/**
+ * https://github.com/ecomclub/storefront-renderer
+ * @author E-Com Club &lt;ti@e-com.club>
+ * @license MIT
  */
 
-const width = imgBody => splitImgSize(imgBody, 0) || ''
+'use strict'
 
-module.exports = width
+// Node.js environment
+if (require.main !== module) {
+  /**
+   * Exports function to call {@link DOM} setup and return {@link Ecom} object.
+   * @module ecomplus-render
+   * @see DOM
+   * @returns {Promise} {@link Ecom}
+   * @example require('ecomplus-render')(html).then(({ dom, Ecom }) => Ecom.init())
+   */
+
+  module.exports = function () {
+    // setup DOM
+    // bypass all arguments
+    return require('./lib/dom').apply(this, arguments).then(dom => {
+      // pass dom (jsdom) and Ecom objects to next function
+      return {
+        dom,
+        Ecom: require('./ecom')
+      }
+    })
+  }
+} else {
+  // called directly
+  // handle command line task
+  require('./cli')
+}
 </code></pre>
         </article>
     </section>
