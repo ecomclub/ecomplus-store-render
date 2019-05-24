@@ -7,14 +7,19 @@ const specTextValue = require('./specTextValue')
  * @memberOf Ecom.methods
  * @param {object} body - Product body object
  * @param {object} [filterGrids] - Filter object with grids and searched values
+ * @param {boolean} [inStockOnly] - True to consider only variations with positive stock quantity
  * @param {string} [delimiter=', '] - Delimiter between each specification
  * @returns {object}
  */
 
-const variationsGrids = (body, filterGrids, delimiter) => {
+const variationsGrids = (body, filterGrids, inStockOnly, delimiter) => {
   let grids = {}
   if (body.hasOwnProperty('variations')) {
     body.variations.forEach(variation => {
+      if (inStockOnly && variation.quantity <= 0) {
+        // out of stock
+        return
+      }
       let specifications = variation.specifications
       // abstraction to get spec text value
       let specValue = grid => specTextValue(variation, grid, delimiter)
