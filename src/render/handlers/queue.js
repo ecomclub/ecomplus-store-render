@@ -96,6 +96,12 @@ exports.run = (store, queue, currentObj) => {
 
                 // send request to Search API
                 promises.push(searchItems(store, el, body))
+              } else if (el.dataset.hasOwnProperty('searchBy') && body.name) {
+                // search items with filter
+                // set element data to handle ELS query
+                el.dataset[el.dataset.searchBy] = body.name
+                // send request to Search API
+                promises.push(searchItems(store, el, body))
               } else {
                 // simple Store API object
                 promises.push(render(store, el, body))
