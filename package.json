@@ -1,6 +1,6 @@
 {
   "name": "@ecomplus/storefront-renderer",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Vue.js app to render E-Com Plus store template",
   "main": "src/index.node.js",
   "browser": "dist/storefront.min.js",
